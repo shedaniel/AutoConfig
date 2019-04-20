@@ -1,0 +1,32 @@
+{
+    "$schema": "https://gist.githubusercontent.com/MrYurihi/4460e90099cf934b2078c7607bb0562b/raw/3713076d9d16ad66ba00aad3fa525872ab3438af/mod.json",
+    "schemaVersion": 1,
+    "id": "autoconfig",
+    "version": "%VERSION%",
+    "name": "Auto Config API",
+    "description": "Annotation based API for mod configs, with Cloth Config GUI integration",
+    "authors": [
+        "sargunv"
+    ],
+    "contact": {
+        "homepage": "https://gitlab.com/sargunv-mc-mods/auto-config/wikis/home",
+        "sources": "https://gitlab.com/sargunv-mc-mods/auto-config",
+        "issues": "https://gitlab.com/sargunv-mc-mods/auto-config/issues"
+    },
+    "license": "Apache-2.0",
+    "icon": "assets/autoconfig/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+        ]
+    },
+    "mixins": [
+    ],
+    "requires": {
+        "fabricloader": ">=0.4.0",
+        "clothconfig": ">=0.1.3"
+    },
+    "custom": {
+        "modmenu:api": true
+    }
+}
