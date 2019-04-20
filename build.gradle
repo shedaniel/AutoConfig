@@ -106,7 +106,14 @@ publishing {
 
 	// select the repositories you want to publish to
 	repositories {
+		maven {
+			url publish_maven_url
+			credentials(AwsCredentials) {
+				accessKey publish_maven_access_key
+				secretKey publish_maven_secret_key
+			}
+		}
 		// uncomment to publish to the local maven
-		 mavenLocal()
+		// mavenLocal()
 	}
 }
