@@ -39,6 +39,7 @@ dependencies {
 	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	modCompile "cloth-config:ClothConfig:${project.cloth_config_version}"
+	include "cloth-config:ClothConfig:${project.cloth_config_version}"
 
 	modCompile "io.github.prospector.modmenu:ModMenu:1.4.0-72"
 
