@@ -18,12 +18,16 @@
     "environment": "*",
     "entrypoints": {
         "main": [
+            "me.sargunvohra.mcmods.autoconfig.example.ExampleInit"
+        ],
+        "modmenu": [
+            "me.sargunvohra.mcmods.autoconfig.example.ExampleModMenuCompat"
         ]
     },
-    "mixins": [
-    ],
+    "mixins": [],
     "requires": {
         "fabricloader": ">=0.4.0",
+        "fabric": "*",
         "clothconfig": ">=0.1.3"
     },
     "custom": {

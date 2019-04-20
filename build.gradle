@@ -1,9 +1,9 @@
 plugins {
-	id 'fabric-loom' version '0.2.1-SNAPSHOT'
-	id 'maven-publish'
-	id "com.palantir.git-version" version "0.11.0"
-	id 'com.github.johnrengelman.shadow' version '5.0.0'
-	id 'java'
+    id 'fabric-loom' version '0.2.1-SNAPSHOT'
+    id 'maven-publish'
+    id "com.palantir.git-version" version "0.11.0"
+    id 'com.github.johnrengelman.shadow' version '5.0.0'
+    id 'java'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -17,105 +17,111 @@ minecraft {
 }
 
 repositories {
-	maven {
-		url = "http://maven.fabricmc.net"
-	}
-	maven {
-		url = "https://minecraft.curseforge.com/api/maven"
-	}
-	maven {
-		url = "https://maven.fabricmc.net/io/github/prospector/modmenu/ModMenu/"
-	}
+    mavenCentral()
+    maven {
+        url = "http://maven.fabricmc.net"
+    }
+    maven {
+        url = "https://minecraft.curseforge.com/api/maven"
+    }
+    maven {
+        url = "https://maven.fabricmc.net/io/github/prospector/modmenu/ModMenu/"
+    }
 }
 
 dependencies {
-	compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
+    compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
 
-	shadow "blue.endless:jankson:${project.jankson_version}"
-	implementation "blue.endless:jankson:${project.jankson_version}"
+    shadow ("blue.endless:jankson:${project.jankson_version}") { transitive = false }
+    implementation "blue.endless:jankson:${project.jankson_version}"
 
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}"
-	modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
+    shadow("com.moandjiezana.toml:toml4j:${project.toml4j_version}") { transitive = false }
+    implementation("com.moandjiezana.toml:toml4j:${project.toml4j_version}")
 
-	modCompile "cloth-config:ClothConfig:${project.cloth_config_version}"
-	include "cloth-config:ClothConfig:${project.cloth_config_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}"
+    modCompile "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modCompile "io.github.prospector.modmenu:ModMenu:1.4.0-72"
+    modCompile "net.fabricmc:fabric:${project.fabric_version}"
 
-	// temporary hack until MC-148461 is fixed
-	compile "org.lwjgl:lwjgl-jemalloc:3.2.1"
+    modCompile "cloth-config:ClothConfig:${project.cloth_config_version}"
+
+    modCompile "io.github.prospector.modmenu:ModMenu:1.4.0-72"
+
+    // temporary hack until MC-148461 is fixed
+    compile "org.lwjgl:lwjgl-jemalloc:3.2.1"
 }
 
 processResources {
-	inputs.property "version", project.version
+    inputs.property "version", project.version
 
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
-		filter {line -> line.replace("%VERSION%", "${project.version}")}
-	}
+    from(sourceSets.main.resources.srcDirs) {
+        include "fabric.mod.json"
+        filter { line -> line.replace("%VERSION%", "${project.version}") }
+    }
 
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
-	}
+    from(sourceSets.main.resources.srcDirs) {
+        exclude "fabric.mod.json"
+    }
 }
 
 // ensure that the encoding is set to UTF-8, no matter what the system default is
 // this fixes some edge cases with special characters not displaying correctly
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
+    options.encoding = "UTF-8"
 }
 
 // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 // if it is present.
 // If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
-	archiveClassifier.set("sources")
-	from sourceSets.main.allSource
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
 }
 
 jar {
-	from "LICENSE"
+    from "LICENSE"
 }
 
 shadowJar {
-	relocate 'blue.endless.jankson', 'me.sargunvohra.mcmods.autoconfig.shadowed.blue.endless.jankson'
-	archiveClassifier.set("")
-	configurations = [project.configurations.shadow]
+    relocate 'blue.endless.jankson', 'me.sargunvohra.mcmods.autoconfig.shadowed.blue.endless.jankson'
+    relocate 'com.moandjiezana.toml', 'me.sargunvohra.mcmods.autoconfig.shadowed.com.moandjiezana.toml'
+    archiveClassifier.set("")
+    configurations = [project.configurations.shadow]
 }
 
 remapJar {
-	dependsOn shadowJar
-	jar = shadowJar.archiveFile.get().asFile
+    dependsOn shadowJar
+    jar = shadowJar.archiveFile.get().asFile
 }
 
 // configure the maven publication
 publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(jar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-		}
-	}
+    publications {
+        mavenJava(MavenPublication) {
+            // add all the jars that should be included when publishing to maven
+            artifact(jar) {
+                builtBy remapJar
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
 
-	// select the repositories you want to publish to
-	repositories {
-		if (project.hasProperty('publish_maven_url')) {
-			maven {
-				url publish_maven_url
-				credentials(AwsCredentials) {
-					accessKey publish_maven_access_key
-					secretKey publish_maven_secret_key
-				}
-			}
-		}
-		// uncomment to publish to the local maven
-		// mavenLocal()
-	}
+    // select the repositories you want to publish to
+    repositories {
+        if (project.hasProperty('publish_maven_url')) {
+            maven {
+                url publish_maven_url
+                credentials(AwsCredentials) {
+                    accessKey publish_maven_access_key
+                    secretKey publish_maven_secret_key
+                }
+            }
+        }
+        // uncomment to publish to the local maven
+        // mavenLocal()
+    }
 }

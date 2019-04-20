@@ -49,16 +49,19 @@ public class AutoConfig {
     }
 
     @SuppressWarnings({"unused"})
+    public static <T extends ConfigData> ConfigHolder<T> registerToml4j(
+        String configName,
+        Class<T> configClass
+    ) {
+        return register(configName, configClass, Toml4jConfigSerializer::new);
+    }
+
+    @SuppressWarnings({"unused"})
     public static <T extends ConfigData> ConfigHolder<T> registerDummy(
         String configName,
-        T value
+        Class<T> configClass
     ) {
-        //noinspection unchecked
-        return register(
-            configName,
-            (Class<T>) value.getClass(),
-            (cName, cClass) -> new DummyConfigSerializer<>(value)
-        );
+        return register(configName, configClass, DummyConfigSerializer::new);
     }
 
     @SuppressWarnings("WeakerAccess")
