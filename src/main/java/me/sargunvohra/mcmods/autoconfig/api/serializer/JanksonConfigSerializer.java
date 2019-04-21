@@ -1,4 +1,4 @@
-package me.sargunvohra.mcmods.autoconfig.impl;
+package me.sargunvohra.mcmods.autoconfig.api.serializer;
 
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;

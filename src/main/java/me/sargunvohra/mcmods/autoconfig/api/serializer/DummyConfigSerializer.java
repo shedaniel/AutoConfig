@@ -1,4 +1,4 @@
-package me.sargunvohra.mcmods.autoconfig.impl;
+package me.sargunvohra.mcmods.autoconfig.api.serializer;
 
 import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;

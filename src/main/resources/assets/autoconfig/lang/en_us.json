@@ -1,7 +1,7 @@
 {
     "text.autoconfig.config.title": "Auto Config Example",
     "text.autoconfig.config.category.general": "General",
-    "text.autoconfig.config.category.other": "General",
+    "text.autoconfig.config.category.other": "Other",
     "text.autoconfig.config.option.general.aBoolean": "A Boolean",
     "text.autoconfig.config.option.general.anEnum": "An Enum",
     "text.autoconfig.config.option.other.aString": "A String",

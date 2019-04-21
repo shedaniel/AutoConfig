@@ -2,13 +2,14 @@ package me.sargunvohra.mcmods.autoconfig.impl;
 
 import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry;
-import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry.LongSlider;
+import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiProvider;
 import me.shedaniel.cloth.api.ConfigScreenBuilder;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
-import me.shedaniel.cloth.gui.entries.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -20,15 +21,23 @@ import java.util.stream.Collector;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry.IntSlider;
 
 @Environment(EnvType.CLIENT)
 public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
+
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private ConfigManager<T> manager;
+    private ConfigGuiProvider guiProvider;
     private Screen parent;
 
-    public ConfigScreenProvider(ConfigManager<T> manager, Screen parent) {
+    public ConfigScreenProvider(
+        ConfigManager<T> manager,
+        ConfigGuiProvider guiProvider,
+        Screen parent
+    ) {
         this.manager = manager;
+        this.guiProvider = guiProvider;
         this.parent = parent;
     }
 
@@ -46,34 +55,12 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         );
     }
 
-    private static <V> V getUnsafely(Field field, Object obj) {
-        try {
-            //noinspection unchecked
-            return (V) field.get(obj);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void setUnsafely(Field field, Object obj, Object newValue) {
-        try {
-            field.set(obj, newValue);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static boolean fieldTypeIsOneOf(Field field, Class... types) {
-        return Arrays.stream(types).anyMatch(type -> field.getType() == type);
-    }
-
     @Override
     public Screen get() {
-        T current = manager.getConfig();
+        T config = manager.getConfig();
         T defaults = manager.getSerializer().createDefault();
 
         String baseI13n = String.format("text.%s.config", manager.getName());
-        String resetI13n = "text.cloth.reset_value";
 
         ClothConfigScreen.Builder builder = new ClothConfigScreen.Builder(
             parent, String.format("%s.title", baseI13n), (savedConfig) -> manager.save());
@@ -100,98 +87,16 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
                 );
 
         guiFields.forEach((field, entry) -> {
+            field.setAccessible(true);
             String category = entry.category();
             String optionI13n = String.format("%s.option.%s.%s", baseI13n, category, field.getName());
+            ClothConfigScreen.AbstractListEntry gui = guiProvider.get(optionI13n, field, config, defaults);
 
-            field.setAccessible(true);
-            ClothConfigScreen.AbstractListEntry optionGui;
-
-            if (field.isAnnotationPresent(IntSlider.class)) {
-                IntSlider slider = field.getAnnotation(IntSlider.class);
-                optionGui = new IntegerSliderEntry(
-                    optionI13n,
-                    slider.min(),
-                    slider.max(),
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (field.isAnnotationPresent(LongSlider.class)) {
-                LongSlider slider = field.getAnnotation(LongSlider.class);
-                optionGui = new LongSliderEntry(
-                    optionI13n,
-                    slider.min(),
-                    slider.max(),
-                    getUnsafely(field, current),
-                    newValue -> setUnsafely(field, current, newValue),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults)
-                );
-            } else if (field.getType().isEnum()) {
-                //noinspection unchecked
-                optionGui = new EnumListEntry(
-                    optionI13n,
-                    field.getType(),
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (fieldTypeIsOneOf(field, boolean.class, Boolean.class)) {
-                optionGui = new BooleanListEntry(
-                    optionI13n,
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (fieldTypeIsOneOf(field, double.class, Double.class)) {
-                optionGui = new DoubleListEntry(
-                    optionI13n,
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (fieldTypeIsOneOf(field, float.class, Float.class)) {
-                optionGui = new FloatListEntry(
-                    optionI13n,
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (fieldTypeIsOneOf(field, int.class, Integer.class)) {
-                optionGui = new IntegerListEntry(
-                    optionI13n,
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (fieldTypeIsOneOf(field, long.class, Long.class)) {
-                optionGui = new LongListEntry(
-                    optionI13n,
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
-            } else if (fieldTypeIsOneOf(field, String.class)) {
-                optionGui = new StringListEntry(
-                    optionI13n,
-                    getUnsafely(field, current),
-                    resetI13n,
-                    () -> getUnsafely(field, defaults),
-                    newValue -> setUnsafely(field, current, newValue)
-                );
+            if (gui != null) {
+                categories.get(category).addOption(gui);
             } else {
-                throw new IllegalStateException(
-                    String.format("Gui entry is not possible for field '%s'", field));
+                LOGGER.error("No GUI provider registered for field '{}'!", field);
             }
-
-            categories.get(category).addOption(optionGui);
         });
 
         return builder.build();

@@ -2,15 +2,18 @@ package me.sargunvohra.mcmods.autoconfig.example;
 
 import io.github.prospector.modmenu.api.ModMenuApi;
 import me.sargunvohra.mcmods.autoconfig.api.AutoConfig;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
 
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@Environment(EnvType.CLIENT)
 public class ExampleModMenuCompat implements ModMenuApi {
     @Override
     public String getModId() {
-        return ExampleInit.MOD_ID;
+        return ExampleInit.EXAMPLE;
     }
 
     @Override
