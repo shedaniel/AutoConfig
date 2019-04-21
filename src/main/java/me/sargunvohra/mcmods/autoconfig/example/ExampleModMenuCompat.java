@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Screen;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class ExampleModMenuCompat implements ModMenuApi {
     @Override

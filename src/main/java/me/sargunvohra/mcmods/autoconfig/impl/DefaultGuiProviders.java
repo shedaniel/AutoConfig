@@ -2,6 +2,8 @@ package me.sargunvohra.mcmods.autoconfig.impl;
 
 import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiRegistry;
 import me.shedaniel.cloth.gui.entries.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -12,6 +14,7 @@ import java.util.stream.Collectors;
 
 import static me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry.*;
 
+@Environment(EnvType.CLIENT)
 public class DefaultGuiProviders {
 
     private static final String RESET_KEY = "text.cloth.reset_value";
@@ -42,7 +45,7 @@ public class DefaultGuiProviders {
         }
     }
 
-    public static void apply(ConfigGuiRegistry registry) {
+    public static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
 
         registry.registerForAnnotations(
             (i13n, field, config, defaults, guiProvider) -> {
@@ -191,5 +194,7 @@ public class DefaultGuiProviders {
             ),
             String.class
         );
+
+        return registry;
     }
 }

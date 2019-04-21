@@ -20,11 +20,6 @@ import java.util.function.Supplier;
 public class AutoConfig {
     private static final Map<String, ConfigHolder> holders = new HashMap<>();
     private static final Map<String, ConfigGuiRegistry> guiRegistries = new HashMap<>();
-    private static final ConfigGuiRegistry defaultGuiRegistry = new ConfigGuiRegistry();
-
-    static {
-        DefaultGuiProviders.apply(defaultGuiRegistry);
-    }
 
     private AutoConfig() {
     }
@@ -45,7 +40,6 @@ public class AutoConfig {
         ConfigSerializer<T> serializer = serializerFactory.create(configName, configClass);
         ConfigManager<T> manager = new ConfigManager<>(configName, configClass, serializer);
         holders.put(configName, manager);
-        guiRegistries.put(configName, new ConfigGuiRegistry());
 
         return manager;
     }
@@ -60,13 +54,9 @@ public class AutoConfig {
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
+    @Environment(EnvType.CLIENT)
     public static ConfigGuiRegistry getGuiRegistry(String name) {
-        if (guiRegistries.containsKey(name)) {
-            return guiRegistries.get(name);
-        } else {
-            throw new RuntimeException(String.format("Config '%s' has not been registered", name));
-        }
+        return guiRegistries.computeIfAbsent(name, n -> new ConfigGuiRegistry());
     }
 
     @Environment(EnvType.CLIENT)
@@ -74,7 +64,7 @@ public class AutoConfig {
         //noinspection unchecked
         return new <T>ConfigScreenProvider(
             (ConfigManager<T>) AutoConfig.<T>getConfigHolder(name),
-            new ComposedGuiProvider(getGuiRegistry(name), defaultGuiRegistry),
+            new ComposedGuiProvider(getGuiRegistry(name), ClientOnly.defaultGuiRegistry),
             parent
         );
     }
@@ -109,5 +99,11 @@ public class AutoConfig {
         Class<T> configClass
     ) {
         return register(configName, configClass, DummyConfigSerializer::new);
+    }
+
+    @Environment(EnvType.CLIENT)
+    private static class ClientOnly {
+        private static final ConfigGuiRegistry defaultGuiRegistry
+            = DefaultGuiProviders.apply(new ConfigGuiRegistry());
     }
 }

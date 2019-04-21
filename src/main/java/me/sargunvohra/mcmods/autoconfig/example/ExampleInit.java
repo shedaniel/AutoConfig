@@ -1,7 +1,7 @@
 package me.sargunvohra.mcmods.autoconfig.example;
 
 import me.sargunvohra.mcmods.autoconfig.api.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig.api.serializer.Toml4jConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig.api.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 
 public class ExampleInit implements ModInitializer {
@@ -9,7 +9,7 @@ public class ExampleInit implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        AutoConfig.register(CONFIG, ExampleConfig.class, Toml4jConfigSerializer::new);
+        AutoConfig.register(CONFIG, ExampleConfig.class, JanksonConfigSerializer::new);
 
         //noinspection unused
         ExampleConfig config = AutoConfig.<ExampleConfig>getConfigHolder(CONFIG).getConfig();

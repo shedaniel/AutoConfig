@@ -3,8 +3,6 @@ package me.sargunvohra.mcmods.autoconfig.api;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -18,8 +16,6 @@ import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public final class ConfigGuiRegistry implements ConfigGuiProvider {
-    private static final Logger LOGGER = LogManager.getLogger();
-
     private Map<Class, ConfigGuiProvider> typeProviders = new LinkedHashMap<>();
     private Map<Predicate<Field>, ConfigGuiProvider> predicateProviders = new LinkedHashMap<>();
     private Map<Class<? extends Annotation>, ConfigGuiProvider> annotationProviders = new LinkedHashMap<>();

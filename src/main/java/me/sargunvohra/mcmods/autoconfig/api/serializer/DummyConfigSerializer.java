@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 
 public class DummyConfigSerializer<T extends ConfigData> implements ConfigSerializer<T> {
 
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final String name;
     private final Class<T> configClass;
 
@@ -18,7 +19,7 @@ public class DummyConfigSerializer<T extends ConfigData> implements ConfigSerial
 
     @Override
     public void serialize(T config) {
-        LogManager.getLogger().info("Pretending to serialize config '{}'", name);
+        LogManager.getLogger().info("Pretending to serialize config {}", config);
     }
 
     @Override
