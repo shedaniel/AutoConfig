@@ -27,6 +27,7 @@ public class DefaultGuiProviders {
             return null;
 
         try {
+            field.setAccessible(true);
             //noinspection unchecked
             return (V) field.get(obj);
         } catch (ReflectiveOperationException e) {
@@ -39,6 +40,7 @@ public class DefaultGuiProviders {
             return;
 
         try {
+            field.setAccessible(true);
             field.set(obj, newValue);
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);

@@ -84,9 +84,9 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
                 );
 
         guiFields.forEach((field, entry) -> {
-            field.setAccessible(true);
             String category = entry.category();
             String optionI13n = String.format("%s.option.%s.%s", i13n, category, field.getName());
+
             List<ClothConfigScreen.AbstractListEntry> listEntries =
                 guiProvider.get(optionI13n, field, config, defaults, guiProvider);
 
