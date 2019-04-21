@@ -30,8 +30,6 @@ repositories {
 }
 
 dependencies {
-    compile group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2'
-
     shadow ("blue.endless:jankson:${project.jankson_version}") { transitive = false }
     implementation "blue.endless:jankson:${project.jankson_version}"
 
