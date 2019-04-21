@@ -4,6 +4,7 @@ import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig.impl.Utils;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -27,9 +28,11 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
 
     @Override
     public void serialize(T config) throws SerializationException {
+        Path configPath = getConfigPath();
         try {
+            Files.createDirectories(configPath.getParent());
             TomlWriter writer = new TomlWriter();
-            writer.write(config, getConfigPath().toFile());
+            writer.write(config, configPath.toFile());
         } catch (IOException e) {
             throw new SerializationException(e);
         }
@@ -51,12 +54,6 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
 
     @Override
     public T createDefault() {
-        try {
-            Constructor<T> constructor = configClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+        return Utils.constructUnsafely(configClass);
     }
 }

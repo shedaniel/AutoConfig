@@ -1,62 +1,54 @@
 package me.sargunvohra.mcmods.autoconfig.example;
 
-import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry;
+import me.sargunvohra.mcmods.autoconfig.api.serializer.ModularSerializer;
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
-public class ExampleConfig implements ConfigData {
-    @ConfigGuiEntry
-    private boolean aBoolean = true;
+@SuppressWarnings("unused")
+public class ExampleConfig implements ModularSerializer.ModularConfigData {
 
-    @ConfigGuiEntry
-    private Foo anEnum = Foo.ONE;
-
-    @ConfigGuiEntry(category = "other")
-    private String aString = "hello";
-
-    @ConfigGuiEntry(category = "other")
-    @ConfigGuiEntry.IntSlider(min = 0, max = 1000)
-    private int aSlider = 500;
-
-    @ConfigGuiEntry(category = "nesting")
+    @ConfigGuiEntry(category = "a")
     @ConfigGuiEntry.Transitive
-    private Bar anObject = new Bar();
+    ModuleA moduleA = new ModuleA();
 
-    // fields without @ConfigGuiEntry are saved and loaded, but don't appear in the config gui
-    private Bar aHiddenObject = new Bar();
+    @ConfigGuiEntry(category = "b")
+    @ConfigGuiEntry.Transitive
+    ModuleB moduleB = new ModuleB();
 
-    enum Foo {
-        ONE, TWO, THREE
+    enum ExampleEnum {
+        FOO, BAR, BAZ
     }
 
-    public static class Bar {
+    private static class ModuleA implements ModularSerializer.Module {
 
-        // fields inside transitive objects don't need @ConfigGuiEntry
-        // the category of each nested field is always the same as its top level field
+        private boolean aBoolean = true;
 
-        @ConfigGuiEntry.IntSlider(min = 0, max = 20)
-        int a = 10;
+        private ExampleEnum anEnum = ExampleEnum.FOO;
 
-        int b = 20;
+        private String aString = "hello";
 
-        @Override
-        public String toString() {
-            return "Bar{" +
-                "a=" + a +
-                ", b=" + b +
-                '}';
+        @ConfigGuiEntry.Transitive
+        private TwoInts anObject = new TwoInts(1, 2);
+    }
+
+    private static class ModuleB implements ModularSerializer.Module {
+
+        @ConfigGuiEntry.IntSlider(min = -1000, max = 2000)
+        private int intSlider = 500;
+
+        @ConfigGuiEntry.LongSlider(min = -1000L, max = 2000L)
+        private long longSlider = 500L;
+
+        @ConfigGuiEntry.Transitive
+        private TwoInts anObject = new TwoInts(3, 4);
+    }
+
+    private static class TwoInts {
+        int first;
+        int second;
+
+        TwoInts(int first, int second) {
+            this.first = first;
+            this.second = second;
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ExampleConfig{" +
-            "aBoolean=" + aBoolean +
-            ", anEnum=" + anEnum +
-            ", aString='" + aString + '\'' +
-            ", aSlider=" + aSlider +
-            ", anObject=" + anObject +
-            ", aHiddenObject=" + aHiddenObject +
-            '}';
     }
 }

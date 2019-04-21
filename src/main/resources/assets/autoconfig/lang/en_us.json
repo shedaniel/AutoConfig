@@ -1,12 +1,14 @@
 {
     "text.autoconfig.autoconfig_example.title": "Auto Config Example",
-    "text.autoconfig.autoconfig_example.category.general": "General",
-    "text.autoconfig.autoconfig_example.category.other": "Other",
-    "text.autoconfig.autoconfig_example.category.nesting": "Nesting",
-    "text.autoconfig.autoconfig_example.option.general.aBoolean": "A Boolean",
-    "text.autoconfig.autoconfig_example.option.general.anEnum": "An Enum",
-    "text.autoconfig.autoconfig_example.option.other.aString": "A String",
-    "text.autoconfig.autoconfig_example.option.other.aSlider": "A Slider",
-    "text.autoconfig.autoconfig_example.option.nesting.anObject.a": "An Object's A",
-    "text.autoconfig.autoconfig_example.option.nesting.anObject.b": "An Object's B"
+    "text.autoconfig.autoconfig_example.category.a": "Example Category A",
+    "text.autoconfig.autoconfig_example.category.b": "Example Category B",
+    "text.autoconfig.autoconfig_example.option.a.moduleA.aBoolean": "A Boolean",
+    "text.autoconfig.autoconfig_example.option.a.moduleA.anEnum": "An Enum",
+    "text.autoconfig.autoconfig_example.option.a.moduleA.aString": "A String",
+    "text.autoconfig.autoconfig_example.option.a.moduleA.anObject.first": "First A",
+    "text.autoconfig.autoconfig_example.option.a.moduleA.anObject.second": "Second A",
+    "text.autoconfig.autoconfig_example.option.b.moduleB.intSlider": "Int Slider",
+    "text.autoconfig.autoconfig_example.option.b.moduleB.longSlider": "Long Slider",
+    "text.autoconfig.autoconfig_example.option.b.moduleB.anObject.first": "First B",
+    "text.autoconfig.autoconfig_example.option.b.moduleB.anObject.second": "Second B"
 }

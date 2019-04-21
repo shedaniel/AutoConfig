@@ -5,7 +5,6 @@ import me.shedaniel.cloth.gui.entries.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,6 +12,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry.*;
+import static me.sargunvohra.mcmods.autoconfig.impl.Utils.getUnsafely;
+import static me.sargunvohra.mcmods.autoconfig.impl.Utils.setUnsafely;
 
 @Environment(EnvType.CLIENT)
 public class DefaultGuiProviders {
@@ -20,31 +21,6 @@ public class DefaultGuiProviders {
     private static final String RESET_KEY = "text.cloth.reset_value";
 
     private DefaultGuiProviders() {
-    }
-
-    private static <V> V getUnsafely(Field field, Object obj) {
-        if (obj == null)
-            return null;
-
-        try {
-            field.setAccessible(true);
-            //noinspection unchecked
-            return (V) field.get(obj);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void setUnsafely(Field field, Object obj, Object newValue) {
-        if (obj == null)
-            return;
-
-        try {
-            field.setAccessible(true);
-            field.set(obj, newValue);
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {

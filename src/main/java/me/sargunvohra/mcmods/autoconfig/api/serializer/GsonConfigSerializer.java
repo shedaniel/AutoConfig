@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig.impl.Utils;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
@@ -37,8 +38,10 @@ public class GsonConfigSerializer<T extends ConfigData> implements ConfigSeriali
 
     @Override
     public void serialize(T config) throws SerializationException {
+        Path configPath = getConfigPath();
         try {
-            BufferedWriter writer = Files.newBufferedWriter(getConfigPath());
+            Files.createDirectories(configPath.getParent());
+            BufferedWriter writer = Files.newBufferedWriter(configPath);
             gson.toJson(config, writer);
             writer.close();
         } catch (IOException e) {
@@ -65,12 +68,6 @@ public class GsonConfigSerializer<T extends ConfigData> implements ConfigSeriali
 
     @Override
     public T createDefault() {
-        try {
-            Constructor<T> constructor = configClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+        return Utils.constructUnsafely(configClass);
     }
 }

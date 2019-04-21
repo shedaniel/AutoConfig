@@ -12,6 +12,7 @@ public @interface ConfigGuiEntry {
     String category() default "general";
 
     @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     @interface IntSlider {
         int min();
 
@@ -19,6 +20,7 @@ public @interface ConfigGuiEntry {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     @interface LongSlider {
         long min();
 
@@ -26,6 +28,7 @@ public @interface ConfigGuiEntry {
     }
 
     @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
     @interface Transitive {
     }
 }

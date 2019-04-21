@@ -2,6 +2,7 @@ package me.sargunvohra.mcmods.autoconfig.api.serializer;
 
 import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig.impl.Utils;
 import org.apache.logging.log4j.LogManager;
 
 import java.lang.reflect.Constructor;
@@ -19,7 +20,6 @@ public class DummyConfigSerializer<T extends ConfigData> implements ConfigSerial
 
     @Override
     public void serialize(T config) {
-        LogManager.getLogger().info("Pretending to serialize config {}", config);
     }
 
     @Override
@@ -29,12 +29,6 @@ public class DummyConfigSerializer<T extends ConfigData> implements ConfigSerial
 
     @Override
     public T createDefault() {
-        try {
-            Constructor<T> constructor = configClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+        return Utils.constructUnsafely(configClass);
     }
 }

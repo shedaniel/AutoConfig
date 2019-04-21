@@ -4,6 +4,7 @@ import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig.impl.Utils;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedWriter;
@@ -35,8 +36,10 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
 
     @Override
     public void serialize(T config) throws SerializationException {
+        Path configPath = getConfigPath();
         try {
-            BufferedWriter writer = Files.newBufferedWriter(getConfigPath());
+            Files.createDirectories(configPath.getParent());
+            BufferedWriter writer = Files.newBufferedWriter(configPath);
             writer.write(jankson.toJson(config).toJson(true, true));
             writer.close();
         } catch (IOException e) {
@@ -60,12 +63,6 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
 
     @Override
     public T createDefault() {
-        try {
-            Constructor<T> constructor = configClass.getDeclaredConstructor();
-            constructor.setAccessible(true);
-            return constructor.newInstance();
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+        return Utils.constructUnsafely(configClass);
     }
 }
