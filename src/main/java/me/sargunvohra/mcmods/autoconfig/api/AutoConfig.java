@@ -50,6 +50,35 @@ public class AutoConfig {
         return manager;
     }
 
+    public static <T extends ConfigData> ConfigHolder<T> getConfigHolder(String name) {
+        Objects.requireNonNull(name);
+        if (holders.containsKey(name)) {
+            //noinspection unchecked
+            return (ConfigHolder<T>) holders.get(name);
+        } else {
+            throw new RuntimeException(String.format("Config '%s' has not been registered", name));
+        }
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static ConfigGuiRegistry getGuiRegistry(String name) {
+        if (guiRegistries.containsKey(name)) {
+            return guiRegistries.get(name);
+        } else {
+            throw new RuntimeException(String.format("Config '%s' has not been registered", name));
+        }
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static <T extends ConfigData> Supplier<Screen> getConfigScreen(String name, Screen parent) {
+        //noinspection unchecked
+        return new <T>ConfigScreenProvider(
+            (ConfigManager<T>) AutoConfig.<T>getConfigHolder(name),
+            new ComposedGuiProvider(getGuiRegistry(name), defaultGuiRegistry),
+            parent
+        );
+    }
+
     @Deprecated
     public static <T extends ConfigData> ConfigHolder<T> registerGson(
         String configName,
@@ -80,33 +109,5 @@ public class AutoConfig {
         Class<T> configClass
     ) {
         return register(configName, configClass, DummyConfigSerializer::new);
-    }
-
-    public static <T extends ConfigData> ConfigHolder<T> getConfigHolder(String name) {
-        Objects.requireNonNull(name);
-        if (holders.containsKey(name)) {
-            //noinspection unchecked
-            return (ConfigHolder<T>) holders.get(name);
-        } else {
-            throw new RuntimeException(String.format("Config '%s' has not been registered", name));
-        }
-    }
-
-    public static ConfigGuiRegistry getGuiRegistry(String name) {
-        if (guiRegistries.containsKey(name)) {
-            return guiRegistries.get(name);
-        } else {
-            throw new RuntimeException(String.format("Config '%s' has not been registered", name));
-        }
-    }
-
-    @Environment(EnvType.CLIENT)
-    public static <T extends ConfigData> Supplier<Screen> getConfigScreen(String name, Screen parent) {
-        //noinspection unchecked
-        return new <T>ConfigScreenProvider(
-            (ConfigManager<T>) AutoConfig.<T>getConfigHolder(name),
-            new ComposedGuiProvider(getGuiRegistry(name), defaultGuiRegistry),
-            parent
-        );
     }
 }

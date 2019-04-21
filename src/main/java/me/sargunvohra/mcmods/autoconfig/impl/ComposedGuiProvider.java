@@ -1,10 +1,11 @@
 package me.sargunvohra.mcmods.autoconfig.impl;
 
-import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiProvider;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -14,6 +15,8 @@ import java.util.Objects;
 @Environment(EnvType.CLIENT)
 public class ComposedGuiProvider implements ConfigGuiProvider {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private List<ConfigGuiProvider> children;
 
     public ComposedGuiProvider(ConfigGuiProvider... children) {
@@ -21,16 +24,19 @@ public class ComposedGuiProvider implements ConfigGuiProvider {
     }
 
     @Override
-    public ClothConfigScreen.AbstractListEntry get(
+    public List<ClothConfigScreen.AbstractListEntry> get(
         String i13n,
         Field field,
-        ConfigData config,
-        ConfigData defaults
-    ) {
+        Object config,
+        Object defaults,
+        ConfigGuiProvider guiProvider) {
         return children.stream()
-            .map(child -> child.get(i13n, field, config, defaults))
+            .map(child -> child.get(i13n, field, config, defaults, guiProvider))
             .filter(Objects::nonNull)
             .findFirst()
-            .orElse(null);
+            .orElseGet(() -> {
+                LOGGER.error("No GUI provider registered for field '{}'!", field);
+                return null;
+            });
     }
 }

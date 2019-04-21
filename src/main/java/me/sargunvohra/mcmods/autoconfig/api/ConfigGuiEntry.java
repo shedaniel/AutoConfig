@@ -24,4 +24,8 @@ public @interface ConfigGuiEntry {
 
         long max();
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Transitive {
+    }
 }

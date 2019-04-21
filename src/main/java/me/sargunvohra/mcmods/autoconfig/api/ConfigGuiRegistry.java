@@ -3,10 +3,13 @@ package me.sargunvohra.mcmods.autoconfig.api;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -15,6 +18,8 @@ import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public final class ConfigGuiRegistry implements ConfigGuiProvider {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     private Map<Class, ConfigGuiProvider> typeProviders = new LinkedHashMap<>();
     private Map<Predicate<Field>, ConfigGuiProvider> predicateProviders = new LinkedHashMap<>();
     private Map<Class<? extends Annotation>, ConfigGuiProvider> annotationProviders = new LinkedHashMap<>();
@@ -35,12 +40,12 @@ public final class ConfigGuiRegistry implements ConfigGuiProvider {
     }
 
     @Override
-    public final ClothConfigScreen.AbstractListEntry get(
+    public final List<ClothConfigScreen.AbstractListEntry> get(
         String i13n,
         Field field,
-        ConfigData config,
-        ConfigData defaults
-    ) {
+        Object config,
+        Object defaults,
+        ConfigGuiProvider guiProvider) {
         return firstPresent(
             () -> annotationProviders.entrySet().stream()
                 .filter(entry -> field.isAnnotationPresent(entry.getKey()))
@@ -52,7 +57,7 @@ public final class ConfigGuiRegistry implements ConfigGuiProvider {
                 .map(Map.Entry::getValue),
             () -> Optional.ofNullable(typeProviders.get(field.getType()))
         )
-            .map(provider -> provider.get(i13n, field, config, defaults))
+            .map(provider -> provider.get(i13n, field, config, defaults, guiProvider))
             .orElse(null);
     }
 

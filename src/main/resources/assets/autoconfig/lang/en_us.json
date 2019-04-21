@@ -1,9 +1,12 @@
 {
-    "text.autoconfig.config.title": "Auto Config Example",
-    "text.autoconfig.config.category.general": "General",
-    "text.autoconfig.config.category.other": "Other",
-    "text.autoconfig.config.option.general.aBoolean": "A Boolean",
-    "text.autoconfig.config.option.general.anEnum": "An Enum",
-    "text.autoconfig.config.option.other.aString": "A String",
-    "text.autoconfig.config.option.other.aSlider": "A Slider"
+    "text.autoconfig.autoconfig_example.title": "Auto Config Example",
+    "text.autoconfig.autoconfig_example.category.general": "General",
+    "text.autoconfig.autoconfig_example.category.other": "Other",
+    "text.autoconfig.autoconfig_example.category.nesting": "Nesting",
+    "text.autoconfig.autoconfig_example.option.general.aBoolean": "A Boolean",
+    "text.autoconfig.autoconfig_example.option.general.anEnum": "An Enum",
+    "text.autoconfig.autoconfig_example.option.other.aString": "A String",
+    "text.autoconfig.autoconfig_example.option.other.aSlider": "A Slider",
+    "text.autoconfig.autoconfig_example.option.nesting.anObject.a": "An Object's A",
+    "text.autoconfig.autoconfig_example.option.nesting.anObject.b": "An Object's B"
 }

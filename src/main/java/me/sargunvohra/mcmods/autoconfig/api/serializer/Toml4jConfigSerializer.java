@@ -16,7 +16,6 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
     private String name;
     private Class<T> configClass;
 
-    @SuppressWarnings("WeakerAccess")
     public Toml4jConfigSerializer(String name, Class<T> configClass) {
         this.name = name;
         this.configClass = configClass;

@@ -6,15 +6,17 @@ import net.fabricmc.api.Environment;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.util.List;
 
 @FunctionalInterface
 @Environment(EnvType.CLIENT)
 public interface ConfigGuiProvider {
     @Nullable
-    ClothConfigScreen.AbstractListEntry get(
+    List<ClothConfigScreen.AbstractListEntry> get(
         String i13n,
         Field field,
-        ConfigData config,
-        ConfigData defaults
+        Object config,
+        Object defaults,
+        ConfigGuiProvider guiProvider
     );
 }

@@ -13,11 +13,11 @@ import java.util.function.Supplier;
 public class ExampleModMenuCompat implements ModMenuApi {
     @Override
     public String getModId() {
-        return ExampleInit.EXAMPLE;
+        return "autoconfig";
     }
 
     @Override
     public Optional<Supplier<Screen>> getConfigScreen(Screen screen) {
-        return Optional.of(AutoConfig.getConfigScreen(getModId(), screen));
+        return Optional.of(AutoConfig.getConfigScreen(ExampleInit.CONFIG, screen));
     }
 }
