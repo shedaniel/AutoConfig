@@ -1,5 +1,6 @@
-package me.sargunvohra.mcmods.autoconfig1;
+package me.sargunvohra.mcmods.autoconfig1.gui.registry;
 
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -10,11 +11,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Environment(EnvType.CLIENT)
-class ComposedConfigGuiRegistry implements ConfigGuiProviderTransformer {
+public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
 
-    private List<ConfigGuiProviderTransformer> children;
+    private List<GuiRegistryAccess> children;
 
-    ComposedConfigGuiRegistry(ConfigGuiProviderTransformer... children) {
+    public ComposedGuiRegistryAccess(GuiRegistryAccess... children) {
         this.children = Arrays.asList(children);
     }
 
@@ -24,7 +25,7 @@ class ComposedConfigGuiRegistry implements ConfigGuiProviderTransformer {
         Field field,
         Object config,
         Object defaults,
-        ConfigGuiProviderTransformer registry) {
+        GuiRegistryAccess registry) {
         return children.stream()
             .map(child -> child.get(i13n, field, config, defaults, registry))
             .filter(Objects::nonNull)
@@ -39,9 +40,9 @@ class ComposedConfigGuiRegistry implements ConfigGuiProviderTransformer {
         Field field,
         Object config,
         Object defaults,
-        ConfigGuiProviderTransformer registry
+        GuiRegistryAccess registry
     ) {
-        for (ConfigGuiProviderTransformer child : children) {
+        for (GuiRegistryAccess child : children) {
             guis = child.transform(guis, i13n, field, config, defaults, registry);
         }
         return guis;

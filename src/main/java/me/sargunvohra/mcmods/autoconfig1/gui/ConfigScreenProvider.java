@@ -1,7 +1,10 @@
-package me.sargunvohra.mcmods.autoconfig1;
+package me.sargunvohra.mcmods.autoconfig1.gui;
 
+import me.sargunvohra.mcmods.autoconfig1.ConfigData;
+import me.sargunvohra.mcmods.autoconfig1.ConfigManager;
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -9,21 +12,20 @@ import net.minecraft.client.gui.Screen;
 import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.groupingBy;
 
 @Environment(EnvType.CLIENT)
-class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
+public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
 
     private final ConfigManager<T> manager;
-    private final ConfigGuiProviderTransformer registry;
+    private final GuiRegistryAccess registry;
     private final Screen parent;
 
-    ConfigScreenProvider(
+    public ConfigScreenProvider(
         ConfigManager<T> manager,
-        ConfigGuiProviderTransformer registry,
+        GuiRegistryAccess registry,
         Screen parent
     ) {
         this.manager = manager;

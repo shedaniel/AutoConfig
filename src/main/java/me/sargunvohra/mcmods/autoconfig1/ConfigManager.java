@@ -4,7 +4,7 @@ import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
+public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
 
     private final Logger logger;
 
@@ -26,19 +26,19 @@ class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
         }
     }
 
-    Config getDefinition() {
+    public Config getDefinition() {
         return definition;
     }
 
-    Class<T> getConfigClass() {
+    public Class<T> getConfigClass() {
         return configClass;
     }
 
-    ConfigSerializer<T> getSerializer() {
+    public ConfigSerializer<T> getSerializer() {
         return serializer;
     }
 
-    void save() {
+    public void save() {
         try {
             serializer.serialize(config);
         } catch (ConfigSerializer.SerializationException e) {

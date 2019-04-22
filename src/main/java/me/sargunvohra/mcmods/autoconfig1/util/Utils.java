@@ -9,7 +9,6 @@ import java.util.stream.Collector;
 
 import static java.util.stream.Collectors.toMap;
 
-@SuppressWarnings("WeakerAccess")
 public class Utils {
     private Utils() {
     }

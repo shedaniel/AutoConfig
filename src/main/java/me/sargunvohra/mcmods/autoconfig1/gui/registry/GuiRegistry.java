@@ -1,5 +1,8 @@
-package me.sargunvohra.mcmods.autoconfig1;
+package me.sargunvohra.mcmods.autoconfig1.gui.registry;
 
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiProvider;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiTransformer;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,12 +16,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
-public final class ConfigGuiRegistry implements ConfigGuiProviderTransformer {
+public final class GuiRegistry implements GuiRegistryAccess {
 
     private Map<Priority, List<ProviderEntry>> providers = new HashMap<>();
     private List<TransformerEntry> transformers = new ArrayList<>();
 
-    ConfigGuiRegistry() {
+    public GuiRegistry() {
         for (Priority priority : Priority.values()) {
             providers.put(priority, new ArrayList<>());
         }
@@ -38,7 +41,7 @@ public final class ConfigGuiRegistry implements ConfigGuiProviderTransformer {
         Field field,
         Object config,
         Object defaults,
-        ConfigGuiProviderTransformer registry
+        GuiRegistryAccess registry
     ) {
         return firstPresent(
             Arrays.stream(Priority.values())
@@ -60,47 +63,43 @@ public final class ConfigGuiRegistry implements ConfigGuiProviderTransformer {
         Field field,
         Object config,
         Object defaults,
-        ConfigGuiProviderTransformer registry
+        GuiRegistryAccess registry
     ) {
-        List<ConfigGuiTransformer> matchedTransformers = this.transformers.stream()
+        List<GuiTransformer> matchedTransformers = this.transformers.stream()
             .filter(entry -> entry.predicate.test(field))
             .map(entry -> entry.transformer)
             .collect(Collectors.toList());
 
-        for (ConfigGuiTransformer transformer : matchedTransformers) {
+        for (GuiTransformer transformer : matchedTransformers) {
             guis = transformer.transform(guis, i13n, field, config, defaults, registry);
         }
 
         return guis;
     }
 
-    private void registerProvider(Priority priority, ConfigGuiProvider provider, Predicate<Field> predicate) {
+    private void registerProvider(Priority priority, GuiProvider provider, Predicate<Field> predicate) {
         providers.computeIfAbsent(priority, p -> new ArrayList<>()).add(new ProviderEntry(predicate, provider));
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public final void registerTypeProvider(ConfigGuiProvider provider, Class... types) {
+    public final void registerTypeProvider(GuiProvider provider, Class... types) {
         for (Class type : types) {
             registerProvider(Priority.LAST, provider, field -> type == field.getType());
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
-    public final void registerPredicateProvider(ConfigGuiProvider provider, Predicate<Field> predicate) {
+    public final void registerPredicateProvider(GuiProvider provider, Predicate<Field> predicate) {
         registerProvider(Priority.NORMAL, provider, predicate);
     }
 
-    @SuppressWarnings("WeakerAccess")
     @SafeVarargs
-    public final void registerAnnotationProvider(ConfigGuiProvider provider, Class<? extends Annotation>... types) {
+    public final void registerAnnotationProvider(GuiProvider provider, Class<? extends Annotation>... types) {
         for (Class<? extends Annotation> type : types) {
             registerProvider(Priority.FIRST, provider, field -> field.isAnnotationPresent(type));
         }
     }
 
-    @SuppressWarnings("WeakerAccess")
     @SafeVarargs
-    public final void registerAnnotationProvider(ConfigGuiProvider provider, Predicate<Field> predicate, Class<? extends Annotation>... types) {
+    public final void registerAnnotationProvider(GuiProvider provider, Predicate<Field> predicate, Class<? extends Annotation>... types) {
         for (Class<? extends Annotation> type : types) {
             registerProvider(
                 Priority.FIRST,
@@ -110,17 +109,19 @@ public final class ConfigGuiRegistry implements ConfigGuiProviderTransformer {
         }
     }
 
-    public void registerPredicateTransformer(ConfigGuiTransformer transformer, Predicate<Field> predicate) {
+    @SuppressWarnings("WeakerAccess")
+    public void registerPredicateTransformer(GuiTransformer transformer, Predicate<Field> predicate) {
         transformers.add(new TransformerEntry(predicate, transformer));
     }
 
     @SafeVarargs
-    public final void registerAnnotationTransformer(ConfigGuiTransformer transformer, Class<? extends Annotation>... types) {
+    public final void registerAnnotationTransformer(GuiTransformer transformer, Class<? extends Annotation>... types) {
         registerAnnotationTransformer(transformer, field -> true, types);
     }
 
+    @SuppressWarnings("WeakerAccess")
     @SafeVarargs
-    public final void registerAnnotationTransformer(ConfigGuiTransformer transformer, Predicate<Field> predicate, Class<? extends Annotation>... types) {
+    public final void registerAnnotationTransformer(GuiTransformer transformer, Predicate<Field> predicate, Class<? extends Annotation>... types) {
         for (Class<? extends Annotation> type : types) {
             registerPredicateTransformer(transformer, field -> predicate.test(field) && field.isAnnotationPresent(type));
         }
@@ -132,9 +133,9 @@ public final class ConfigGuiRegistry implements ConfigGuiProviderTransformer {
 
     private static class ProviderEntry {
         final Predicate<Field> predicate;
-        final ConfigGuiProvider provider;
+        final GuiProvider provider;
 
-        ProviderEntry(Predicate<Field> predicate, ConfigGuiProvider provider) {
+        ProviderEntry(Predicate<Field> predicate, GuiProvider provider) {
             this.predicate = predicate;
             this.provider = provider;
         }
@@ -142,9 +143,9 @@ public final class ConfigGuiRegistry implements ConfigGuiProviderTransformer {
 
     private static class TransformerEntry {
         final Predicate<Field> predicate;
-        final ConfigGuiTransformer transformer;
+        final GuiTransformer transformer;
 
-        TransformerEntry(Predicate<Field> predicate, ConfigGuiTransformer transformer) {
+        TransformerEntry(Predicate<Field> predicate, GuiTransformer transformer) {
             this.predicate = predicate;
             this.transformer = transformer;
         }

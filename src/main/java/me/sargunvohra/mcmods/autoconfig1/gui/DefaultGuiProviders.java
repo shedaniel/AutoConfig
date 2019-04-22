@@ -1,6 +1,8 @@
-package me.sargunvohra.mcmods.autoconfig1;
+package me.sargunvohra.mcmods.autoconfig1.gui;
 
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import me.shedaniel.cloth.gui.entries.*;
 import net.fabricmc.api.EnvType;
@@ -14,14 +16,14 @@ import static me.sargunvohra.mcmods.autoconfig1.util.Utils.getUnsafely;
 import static me.sargunvohra.mcmods.autoconfig1.util.Utils.setUnsafely;
 
 @Environment(EnvType.CLIENT)
-class DefaultGuiProviders {
+public class DefaultGuiProviders {
 
     private static final String RESET_KEY = "text.cloth-config.reset_value";
 
     private DefaultGuiProviders() {
     }
 
-    static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
+    public static GuiRegistry apply(GuiRegistry registry) {
 
         registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
@@ -184,7 +186,7 @@ class DefaultGuiProviders {
         return registry;
     }
 
-    private static List<ClothConfigScreen.AbstractListEntry> getChildren(String i13n, Field field, Object config, Object defaults, ConfigGuiProviderTransformer guiProvider) {
+    private static List<ClothConfigScreen.AbstractListEntry> getChildren(String i13n, Field field, Object config, Object defaults, GuiRegistryAccess guiProvider) {
         Object iConfig = getUnsafely(field, config);
         Object iDefaults = getUnsafely(field, defaults);
 

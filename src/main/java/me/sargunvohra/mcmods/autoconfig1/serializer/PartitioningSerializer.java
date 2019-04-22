@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 /**
  * This serializer wraps another serializer and produces a folder with each field of the config
  * corresponding to a single config file.
- *
  * The top level config must inherit from GlobalData.
  * Each field of the top level config must be of a type inheriting from ConfigData.
  */

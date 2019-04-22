@@ -1,5 +1,6 @@
-package me.sargunvohra.mcmods.autoconfig1;
+package me.sargunvohra.mcmods.autoconfig1.gui.registry;
 
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import org.apache.logging.log4j.LogManager;
 
@@ -7,14 +8,14 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 
-class FallbackGuiRegistry implements ConfigGuiProviderTransformer {
+public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
     @Override
     public List<ClothConfigScreen.AbstractListEntry> get(
         String i13n,
         Field field,
         Object config,
         Object defaults,
-        ConfigGuiProviderTransformer registry
+        GuiRegistryAccess registry
     ) {
         LogManager.getLogger().error("No GUI provider registered for field '{}'!", field);
         return Collections.emptyList();
@@ -27,7 +28,7 @@ class FallbackGuiRegistry implements ConfigGuiProviderTransformer {
         Field field,
         Object config,
         Object defaults,
-        ConfigGuiProviderTransformer registry
+        GuiRegistryAccess registry
     ) {
         return guis;
     }

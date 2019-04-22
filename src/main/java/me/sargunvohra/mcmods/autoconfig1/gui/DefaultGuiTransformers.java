@@ -1,7 +1,8 @@
-package me.sargunvohra.mcmods.autoconfig1;
+package me.sargunvohra.mcmods.autoconfig1.gui;
 
 import blue.endless.jankson.Comment;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import me.shedaniel.cloth.gui.entries.TextListEntry;
 import net.fabricmc.api.EnvType;
@@ -17,12 +18,12 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Environment(EnvType.CLIENT)
-class DefaultGuiTransformers {
+public class DefaultGuiTransformers {
 
     private DefaultGuiTransformers() {
     }
 
-    static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
+    public static GuiRegistry apply(GuiRegistry registry) {
 
         registry.registerAnnotationTransformer(
             (guis, i13n, field, config, defaults, guiProvider) -> guis.stream()

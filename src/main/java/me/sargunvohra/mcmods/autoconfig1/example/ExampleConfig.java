@@ -9,6 +9,7 @@ import me.sargunvohra.mcmods.autoconfig1.serializer.PartitioningSerializer;
 import java.util.Arrays;
 import java.util.List;
 
+@SuppressWarnings("unused")
 @Config(name = "autoconfig_example")
 @Config.Gui.Background("minecraft:textures/block/oak_planks.png")
 class ExampleConfig extends PartitioningSerializer.GlobalData {

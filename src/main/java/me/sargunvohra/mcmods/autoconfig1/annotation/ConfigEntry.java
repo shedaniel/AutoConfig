@@ -32,18 +32,17 @@ public class ConfigEntry {
         long max();
     }
 
-    /**
-     * Applies to float and double fields.
-     * In a future version it will enforce bounds at deserialization.
-     * Does nothing right now.
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    public @interface BoundedFloating {
-        double min() default 0;
-
-        double max();
-    }
+//    /**
+//     * Applies to float and double fields.
+//     * In a future version it will enforce bounds at deserialization.
+//     */
+//    @Retention(RetentionPolicy.RUNTIME)
+//    @Target(ElementType.FIELD)
+//    public @interface BoundedFloating {
+//        double min() default 0;
+//
+//        double max();
+//    }
 
     public static class Gui {
         private Gui() {

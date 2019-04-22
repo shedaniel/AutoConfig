@@ -1,19 +1,24 @@
 package me.sargunvohra.mcmods.autoconfig1;
 
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
-import me.shedaniel.cloth.gui.ClothConfigScreen;
+import me.sargunvohra.mcmods.autoconfig1.gui.ConfigScreenProvider;
+import me.sargunvohra.mcmods.autoconfig1.gui.DefaultGuiProviders;
+import me.sargunvohra.mcmods.autoconfig1.gui.DefaultGuiTransformers;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.DefaultGuiRegistryAccess;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
+import me.sargunvohra.mcmods.autoconfig1.gui.registry.ComposedGuiRegistryAccess;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
-import org.apache.logging.log4j.LogManager;
 
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class AutoConfig {
     private static final Map<Class<? extends ConfigData>, ConfigHolder> holders = new HashMap<>();
-    private static final Map<Class<? extends ConfigData>, ConfigGuiRegistry> guiRegistries = new HashMap<>();
+    private static final Map<Class<? extends ConfigData>, GuiRegistry> guiRegistries = new HashMap<>();
 
     private AutoConfig() {
     }
@@ -53,8 +58,8 @@ public class AutoConfig {
     }
 
     @Environment(EnvType.CLIENT)
-    public static <T extends ConfigData> ConfigGuiRegistry getGuiRegistry(Class<T> configClass) {
-        return guiRegistries.computeIfAbsent(configClass, n -> new ConfigGuiRegistry());
+    public static <T extends ConfigData> GuiRegistry getGuiRegistry(Class<T> configClass) {
+        return guiRegistries.computeIfAbsent(configClass, n -> new GuiRegistry());
     }
 
     @Environment(EnvType.CLIENT)
@@ -62,10 +67,10 @@ public class AutoConfig {
         //noinspection unchecked
         return new <T>ConfigScreenProvider(
             (ConfigManager<T>) AutoConfig.getConfigHolder(configClass),
-            new ComposedConfigGuiRegistry(
+            new ComposedGuiRegistryAccess(
                 getGuiRegistry(configClass),
                 ClientOnly.defaultGuiRegistry,
-                new FallbackGuiRegistry()
+                new DefaultGuiRegistryAccess()
             ),
             parent
         );
@@ -73,7 +78,7 @@ public class AutoConfig {
 
     @Environment(EnvType.CLIENT)
     private static class ClientOnly {
-        private static final ConfigGuiRegistry defaultGuiRegistry =
-            DefaultGuiTransformers.apply(DefaultGuiProviders.apply(new ConfigGuiRegistry()));
+        private static final GuiRegistry defaultGuiRegistry =
+            DefaultGuiTransformers.apply(DefaultGuiProviders.apply(new GuiRegistry()));
     }
 }
