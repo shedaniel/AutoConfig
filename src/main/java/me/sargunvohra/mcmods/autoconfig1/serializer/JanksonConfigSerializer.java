@@ -1,37 +1,41 @@
-package me.sargunvohra.mcmods.autoconfig.api.serializer;
+package me.sargunvohra.mcmods.autoconfig1.serializer;
 
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
-import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
-import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;
-import me.sargunvohra.mcmods.autoconfig.impl.Utils;
+import me.sargunvohra.mcmods.autoconfig1.ConfigData;
+import me.sargunvohra.mcmods.autoconfig1.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
+import me.sargunvohra.mcmods.autoconfig1.util.Utils;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * This serializer serializes configs into Json5 files using Jankson.
+ */
+@SuppressWarnings("unused")
 public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSerializer<T> {
 
-    private String name;
+    private Config definition;
     private Class<T> configClass;
     private Jankson jankson;
 
     @SuppressWarnings("WeakerAccess")
-    public JanksonConfigSerializer(String name, Class<T> configClass, Jankson jankson) {
-        this.name = name;
+    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson) {
+        this.definition = definition;
         this.configClass = configClass;
         this.jankson = jankson;
     }
 
-    public JanksonConfigSerializer(String name, Class<T> configClass) {
-        this(name, configClass, Jankson.builder().build());
+    public JanksonConfigSerializer(Config definition, Class<T> configClass) {
+        this(definition, configClass, Jankson.builder().build());
     }
 
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(name + ".json5");
+        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(definition.name() + ".json5");
     }
 
     @Override

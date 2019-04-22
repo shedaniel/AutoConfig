@@ -1,0 +1,14 @@
+{
+    "text.autoconfig.autoconfig_example.title": "Auto Config Example",
+    "text.autoconfig.autoconfig_example.category.a": "Example Category A",
+    "text.autoconfig.autoconfig_example.category.b": "Example Category B",
+    "text.autoconfig.autoconfig_example.option.moduleA.aBoolean": "A Boolean",
+    "text.autoconfig.autoconfig_example.option.moduleA.anEnum": "An Enum",
+    "text.autoconfig.autoconfig_example.option.moduleA.aString": "A String",
+    "text.autoconfig.autoconfig_example.option.moduleA.anObject.first": "First A",
+    "text.autoconfig.autoconfig_example.option.moduleA.anObject.second": "Second A",
+    "text.autoconfig.autoconfig_example.option.moduleB.intSlider": "Int Slider",
+    "text.autoconfig.autoconfig_example.option.moduleB.longSlider": "Long Slider",
+    "text.autoconfig.autoconfig_example.option.moduleB.anObject.first": "First B",
+    "text.autoconfig.autoconfig_example.option.moduleB.anObject.second": "Second B"
+}

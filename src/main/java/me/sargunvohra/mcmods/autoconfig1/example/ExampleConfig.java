@@ -1,21 +1,22 @@
-package me.sargunvohra.mcmods.autoconfig.example;
+package me.sargunvohra.mcmods.autoconfig1.example;
 
-import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
-import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry;
-import me.sargunvohra.mcmods.autoconfig.api.serializer.PartitioningSerializer;
+import me.sargunvohra.mcmods.autoconfig1.ConfigData;
+import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
+import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
+import me.sargunvohra.mcmods.autoconfig1.serializer.PartitioningSerializer;
 
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("unused")
-public class ExampleConfig extends PartitioningSerializer.GlobalData {
+@Config(name = "autoconfig_example")
+class ExampleConfig extends PartitioningSerializer.GlobalData {
 
-    @ConfigGuiEntry(category = "a")
-    @ConfigGuiEntry.Transitive
+    @ConfigEntry.Category("a")
+    @ConfigEntry.Gui.TransitiveObject
     ModuleA moduleA = new ModuleA();
 
-    @ConfigGuiEntry(category = "b")
-    @ConfigGuiEntry.Transitive
+    @ConfigEntry.Category("b")
+    @ConfigEntry.Gui.TransitiveObject
     ModuleB moduleB = new ModuleB();
 
     enum ExampleEnum {
@@ -30,22 +31,22 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
 
         private String aString = "hello";
 
-        @ConfigGuiEntry.Transitive
+        @ConfigEntry.Gui.TransitiveObject
         private TwoInts anObject = new TwoInts(1, 2);
     }
 
     private static class ModuleB implements ConfigData {
 
-        @ConfigGuiEntry.IntSlider(min = -1000, max = 2000)
+        @ConfigEntry.BoundedDiscrete(min = -1000, max = 2000)
         private int intSlider = 500;
 
-        @ConfigGuiEntry.LongSlider(min = -1000L, max = 2000L)
-        private long longSlider = 500L;
+        @ConfigEntry.BoundedDiscrete(min = -1000, max = 2000)
+        private Long longSlider = 500L;
 
-        @ConfigGuiEntry.Transitive
+        @ConfigEntry.Gui.TransitiveObject
         private TwoInts anObject = new TwoInts(3, 4);
 
-        @ConfigGuiEntry.Exclude
+        @ConfigEntry.Gui.Excluded
         private List<ListItem> aList = Arrays.asList(new ListItem(), new ListItem(3, 4));
     }
 
@@ -53,12 +54,12 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
         private int foo;
         private int bar;
 
-        public ListItem() {
+        ListItem() {
             foo = 1;
             bar = 2;
         }
 
-        public ListItem(int foo, int bar) {
+        ListItem(int foo, int bar) {
             this.foo = foo;
             this.bar = bar;
         }

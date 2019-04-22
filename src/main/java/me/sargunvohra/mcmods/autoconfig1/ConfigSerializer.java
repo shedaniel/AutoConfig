@@ -1,4 +1,6 @@
-package me.sargunvohra.mcmods.autoconfig.api;
+package me.sargunvohra.mcmods.autoconfig1;
+
+import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 
 public interface ConfigSerializer<T extends ConfigData> {
 
@@ -10,7 +12,7 @@ public interface ConfigSerializer<T extends ConfigData> {
 
     @FunctionalInterface
     interface Factory<T extends ConfigData> {
-        ConfigSerializer<T> create(String name, Class<T> configClass);
+        ConfigSerializer<T> create(Config definition, Class<T> configClass);
     }
 
     class SerializationException extends Exception {

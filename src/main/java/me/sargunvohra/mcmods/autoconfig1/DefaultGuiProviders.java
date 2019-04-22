@@ -1,6 +1,6 @@
-package me.sargunvohra.mcmods.autoconfig.impl;
+package me.sargunvohra.mcmods.autoconfig1;
 
-import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiRegistry;
+import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
 import me.shedaniel.cloth.gui.entries.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,59 +11,64 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry.*;
-import static me.sargunvohra.mcmods.autoconfig.impl.Utils.getUnsafely;
-import static me.sargunvohra.mcmods.autoconfig.impl.Utils.setUnsafely;
+import static me.sargunvohra.mcmods.autoconfig1.util.Utils.getUnsafely;
+import static me.sargunvohra.mcmods.autoconfig1.util.Utils.setUnsafely;
 
 @Environment(EnvType.CLIENT)
-public class DefaultGuiProviders {
+class DefaultGuiProviders {
 
-    private static final String RESET_KEY = "text.cloth.reset_value";
+    private static final String RESET_KEY = "text.cloth-config.reset_value";
 
     private DefaultGuiProviders() {
     }
 
-    public static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
+    static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
 
         registry.registerForAnnotations(
             (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
-            Exclude.class
+            ConfigEntry.Gui.Excluded.class
         );
 
         registry.registerForAnnotations(
             (i13n, field, config, defaults, guiProvider) -> {
-                IntSlider slider = field.getAnnotation(IntSlider.class);
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
                 return Collections.singletonList(
                     new IntegerSliderEntry(
                         i13n,
-                        slider.min(),
-                        slider.max(),
-                        getUnsafely(field, config),
+                        (int) bounds.min(),
+                        (int) bounds.max(),
+                        getUnsafely(field, config, 0),
                         RESET_KEY,
                         () -> getUnsafely(field, defaults),
                         newValue -> setUnsafely(field, config, newValue)
                     )
                 );
             },
-            IntSlider.class
+            field -> field.getType() == int.class || field.getType() == Integer.class,
+            ConfigEntry.BoundedDiscrete.class
         );
 
         registry.registerForAnnotations(
             (i13n, field, config, defaults, guiProvider) -> {
-                LongSlider slider = field.getAnnotation(LongSlider.class);
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
                 return Collections.singletonList(
                     new LongSliderEntry(
                         i13n,
-                        slider.min(),
-                        slider.max(),
-                        getUnsafely(field, config),
+                        bounds.min(),
+                        bounds.max(),
+                        getUnsafely(field, config, 0L),
                         newValue -> setUnsafely(field, config, newValue),
                         RESET_KEY,
                         () -> getUnsafely(field, defaults)
                     )
                 );
             },
-            LongSlider.class
+            field -> field.getType() == long.class || field.getType() == Long.class,
+            ConfigEntry.BoundedDiscrete.class
         );
 
         registry.registerForAnnotations(
@@ -82,7 +87,8 @@ public class DefaultGuiProviders {
                     .flatMap(Collection::stream)
                     .collect(Collectors.toList());
             },
-            Transitive.class
+            field -> !field.getType().isPrimitive(),
+            ConfigEntry.Gui.TransitiveObject.class
         );
 
         //noinspection unchecked
@@ -104,7 +110,7 @@ public class DefaultGuiProviders {
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new BooleanListEntry(
                     i13n,
-                    getUnsafely(field, config),
+                    getUnsafely(field, config, false),
                     RESET_KEY,
                     () -> getUnsafely(field, defaults),
                     newValue -> setUnsafely(field, config, newValue)
@@ -117,7 +123,7 @@ public class DefaultGuiProviders {
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new IntegerListEntry(
                     i13n,
-                    getUnsafely(field, config),
+                    getUnsafely(field, config, 0),
                     RESET_KEY,
                     () -> getUnsafely(field, defaults),
                     newValue -> setUnsafely(field, config, newValue)
@@ -130,7 +136,7 @@ public class DefaultGuiProviders {
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new LongListEntry(
                     i13n,
-                    getUnsafely(field, config),
+                    getUnsafely(field, config, 0L),
                     RESET_KEY,
                     () -> getUnsafely(field, defaults),
                     newValue -> setUnsafely(field, config, newValue)
@@ -143,7 +149,7 @@ public class DefaultGuiProviders {
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new FloatListEntry(
                     i13n,
-                    getUnsafely(field, config),
+                    getUnsafely(field, config, 0f),
                     RESET_KEY,
                     () -> getUnsafely(field, defaults),
                     newValue -> setUnsafely(field, config, newValue)
@@ -156,7 +162,7 @@ public class DefaultGuiProviders {
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new DoubleListEntry(
                     i13n,
-                    getUnsafely(field, config),
+                    getUnsafely(field, config, 0.0),
                     RESET_KEY,
                     () -> getUnsafely(field, defaults),
                     newValue -> setUnsafely(field, config, newValue)
@@ -169,7 +175,7 @@ public class DefaultGuiProviders {
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new StringListEntry(
                     i13n,
-                    getUnsafely(field, config),
+                    getUnsafely(field, config, ""),
                     RESET_KEY,
                     () -> getUnsafely(field, defaults),
                     newValue -> setUnsafely(field, config, newValue)

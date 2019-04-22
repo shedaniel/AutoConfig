@@ -1,4 +1,4 @@
-package me.sargunvohra.mcmods.autoconfig.api;
+package me.sargunvohra.mcmods.autoconfig1;
 
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;

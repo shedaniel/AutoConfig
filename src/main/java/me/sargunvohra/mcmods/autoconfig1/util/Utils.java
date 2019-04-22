@@ -1,4 +1,4 @@
-package me.sargunvohra.mcmods.autoconfig.impl;
+package me.sargunvohra.mcmods.autoconfig1.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -9,6 +9,7 @@ import java.util.stream.Collector;
 
 import static java.util.stream.Collectors.toMap;
 
+@SuppressWarnings("WeakerAccess")
 public class Utils {
     private Utils() {
     }
@@ -34,6 +35,13 @@ public class Utils {
         } catch (ReflectiveOperationException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <V> V getUnsafely(Field field, Object obj, V defaultValue) {
+        V ret = getUnsafely(field, obj);
+        if (ret == null)
+            ret = defaultValue;
+        return ret;
     }
 
     public static void setUnsafely(Field field, Object obj, Object newValue) {

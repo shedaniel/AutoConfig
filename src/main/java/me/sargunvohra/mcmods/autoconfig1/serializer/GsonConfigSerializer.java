@@ -1,39 +1,43 @@
-package me.sargunvohra.mcmods.autoconfig.api.serializer;
+package me.sargunvohra.mcmods.autoconfig1.serializer;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
-import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
-import me.sargunvohra.mcmods.autoconfig.api.ConfigSerializer;
-import me.sargunvohra.mcmods.autoconfig.impl.Utils;
+import me.sargunvohra.mcmods.autoconfig1.ConfigData;
+import me.sargunvohra.mcmods.autoconfig1.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
+import me.sargunvohra.mcmods.autoconfig1.util.Utils;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * This serializer serializes configs into Json files using Gson.
+ */
+@SuppressWarnings("unused")
 public class GsonConfigSerializer<T extends ConfigData> implements ConfigSerializer<T> {
 
-    private String name;
+    private Config definition;
     private Class<T> configClass;
     private Gson gson;
 
     @SuppressWarnings("WeakerAccess")
-    public GsonConfigSerializer(String name, Class<T> configClass, Gson gson) {
-        this.name = name;
+    public GsonConfigSerializer(Config definition, Class<T> configClass, Gson gson) {
+        this.definition = definition;
         this.configClass = configClass;
         this.gson = gson;
     }
 
-    public GsonConfigSerializer(String name, Class<T> configClass) {
-        this(name, configClass, new GsonBuilder().setPrettyPrinting().create());
+    public GsonConfigSerializer(Config definition, Class<T> configClass) {
+        this(definition, configClass, new GsonBuilder().setPrettyPrinting().create());
     }
 
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(name + ".json");
+        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(definition.name() + ".json");
     }
 
     @Override
