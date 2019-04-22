@@ -1,5 +1,6 @@
 package me.sargunvohra.mcmods.autoconfig1.example;
 
+import blue.endless.jankson.Comment;
 import me.sargunvohra.mcmods.autoconfig1.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
@@ -32,6 +33,7 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
         @ConfigEntry.Gui.Tooltip(count = 2)
         private ExampleEnum anEnum = ExampleEnum.FOO;
 
+        @Comment("This tooltip was automatically applied from a Jankson @Comment")
         private String aString = "hello";
 
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
