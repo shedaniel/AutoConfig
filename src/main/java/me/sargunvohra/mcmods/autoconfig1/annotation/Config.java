@@ -22,7 +22,7 @@ public @interface Config {
          * Sets the background in the config GUI
          */
         @Retention(RetentionPolicy.RUNTIME)
-        @Target(ElementType.FIELD)
+        @Target(ElementType.TYPE)
         public @interface Background {
             String value();
         }

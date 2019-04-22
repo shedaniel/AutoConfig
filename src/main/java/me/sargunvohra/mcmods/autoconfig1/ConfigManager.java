@@ -26,8 +26,8 @@ class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
         }
     }
 
-    String getName() {
-        return definition.name();
+    Config getDefinition() {
+        return definition;
     }
 
     Class<T> getConfigClass() {

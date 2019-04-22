@@ -1,10 +1,12 @@
 package me.sargunvohra.mcmods.autoconfig1;
 
+import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
+import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
 import java.util.function.Supplier;
@@ -34,12 +36,20 @@ class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
         T config = manager.getConfig();
         T defaults = manager.getSerializer().createDefault();
 
-        String i13n = String.format("text.autoconfig.%s", manager.getName());
+        String i13n = String.format("text.autoconfig.%s", manager.getDefinition().name());
 
         ClothConfigScreen.Builder builder = new ClothConfigScreen.Builder(
             parent, String.format("%s.title", i13n), (savedConfig) -> manager.save());
 
-        Arrays.stream(manager.getConfigClass().getDeclaredFields())
+        Class<T> configClass = manager.getConfigClass();
+
+        if (configClass.isAnnotationPresent(Config.Gui.Background.class)) {
+            String bg = configClass.getAnnotation(Config.Gui.Background.class).value();
+            Identifier bgId = Identifier.create(bg);
+            builder.setBackgroundTexture(bgId);
+        }
+
+        Arrays.stream(configClass.getDeclaredFields())
             .collect(
                 groupingBy(
                     field -> {

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Config(name = "autoconfig_example")
+@Config.Gui.Background("minecraft:textures/block/oak_planks.png")
 class ExampleConfig extends PartitioningSerializer.GlobalData {
 
     @ConfigEntry.Category("a")
@@ -31,8 +32,8 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
         private String aString = "hello";
 
-        @ConfigEntry.Gui.TransitiveObject
-        private TwoInts anObject = new TwoInts(1, 2);
+        @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+        private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
     }
 
     private static class ModuleB implements ConfigData {
@@ -44,32 +45,36 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
         private Long longSlider = 500L;
 
         @ConfigEntry.Gui.TransitiveObject
-        private TwoInts anObject = new TwoInts(3, 4);
+        private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
 
         @ConfigEntry.Gui.Excluded
-        private List<ListItem> aList = Arrays.asList(new ListItem(), new ListItem(3, 4));
+        private List<PairOfInts> aList = Arrays.asList(new PairOfInts(), new PairOfInts(3, 4));
     }
 
-    private static class ListItem {
+    private static class PairOfInts {
         private int foo;
         private int bar;
 
-        ListItem() {
+        PairOfInts() {
             foo = 1;
             bar = 2;
         }
 
-        ListItem(int foo, int bar) {
+        PairOfInts(int foo, int bar) {
             this.foo = foo;
             this.bar = bar;
         }
     }
 
-    private static class TwoInts {
-        int first;
-        int second;
+    private static class PairOfIntPairs {
 
-        TwoInts(int first, int second) {
+        @ConfigEntry.Gui.CollapsibleObject()
+        PairOfInts first;
+
+        @ConfigEntry.Gui.CollapsibleObject()
+        PairOfInts second;
+
+        PairOfIntPairs(PairOfInts first, PairOfInts second) {
             this.first = first;
             this.second = second;
         }

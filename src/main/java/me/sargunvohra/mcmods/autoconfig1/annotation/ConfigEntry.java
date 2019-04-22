@@ -21,7 +21,8 @@ public class ConfigEntry {
 
     /**
      * Applies to int and long fields.
-     * Enforces bounds at deserialization and sets the GUI to a slider.
+     * Sets the GUI to a slider.
+     * In a future version it will enforce bounds at deserialization.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -33,7 +34,7 @@ public class ConfigEntry {
 
     /**
      * Applies to float and double fields.
-     * Enforces bounds at deserialization.
+     * In a future version it will enforce bounds at deserialization.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -62,6 +63,16 @@ public class ConfigEntry {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
         public @interface TransitiveObject {
+        }
+
+        /**
+         * Applies to objects.
+         * Adds GUI entries for the field's inner fields in a collapsible section.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface CollapsibleObject {
+            boolean startExpanded() default false;
         }
 
         /**

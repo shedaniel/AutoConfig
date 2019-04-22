@@ -1,14 +1,13 @@
 package me.sargunvohra.mcmods.autoconfig1;
 
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
+import me.shedaniel.cloth.gui.ClothConfigScreen;
 import me.shedaniel.cloth.gui.entries.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static me.sargunvohra.mcmods.autoconfig1.util.Utils.getUnsafely;
@@ -72,23 +71,21 @@ class DefaultGuiProviders {
         );
 
         registry.registerForAnnotations(
-            (i13n, field, config, defaults, guiProvider) -> {
-                Object iConfig = getUnsafely(field, config);
-                Object iDefaults = getUnsafely(field, defaults);
-
-                return Arrays.stream(field.getType().getDeclaredFields())
-                    .map(
-                        iField -> {
-                            String iI13n = String.format("%s.%s", i13n, iField.getName());
-                            return guiProvider.get(iI13n, iField, iConfig, iDefaults, guiProvider);
-                        }
-                    )
-                    .filter(Objects::nonNull)
-                    .flatMap(Collection::stream)
-                    .collect(Collectors.toList());
-            },
+            DefaultGuiProviders::getChildren,
             field -> !field.getType().isPrimitive(),
             ConfigEntry.Gui.TransitiveObject.class
+        );
+
+        registry.registerForAnnotations(
+            (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
+                new SubCategoryListEntry(
+                    i13n,
+                    getChildren(i13n, field, config, defaults, guiProvider),
+                    field.getAnnotation(ConfigEntry.Gui.CollapsibleObject.class).startExpanded()
+                )
+            ),
+            field -> !field.getType().isPrimitive(),
+            ConfigEntry.Gui.CollapsibleObject.class
         );
 
         //noinspection unchecked
@@ -185,5 +182,21 @@ class DefaultGuiProviders {
         );
 
         return registry;
+    }
+
+    private static List<ClothConfigScreen.AbstractListEntry> getChildren(String i13n, Field field, Object config, Object defaults, ConfigGuiProvider guiProvider) {
+        Object iConfig = getUnsafely(field, config);
+        Object iDefaults = getUnsafely(field, defaults);
+
+        return Arrays.stream(field.getType().getDeclaredFields())
+            .map(
+                iField -> {
+                    String iI13n = String.format("%s.%s", i13n, iField.getName());
+                    return guiProvider.get(iI13n, iField, iConfig, iDefaults, guiProvider);
+                }
+            )
+            .filter(Objects::nonNull)
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 }

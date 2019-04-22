@@ -3,7 +3,7 @@
     "schemaVersion": 1,
     "id": "autoconfig1",
     "version": "%VERSION%",
-    "name": "Auto Config API",
+    "name": "Auto Config v1",
     "description": "Annotation based API for mod configs, with Cloth Config GUI integration",
     "authors": [
         "sargunv"
