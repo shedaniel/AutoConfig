@@ -1,8 +1,8 @@
 package me.sargunvohra.mcmods.autoconfig.example;
 
 import me.sargunvohra.mcmods.autoconfig.api.AutoConfig;
-import me.sargunvohra.mcmods.autoconfig.api.serializer.DummyConfigSerializer;
-import me.sargunvohra.mcmods.autoconfig.api.serializer.ModularSerializer;
+import me.sargunvohra.mcmods.autoconfig.api.serializer.JanksonConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig.api.serializer.PartitioningSerializer;
 import net.fabricmc.api.ModInitializer;
 
 public class ExampleInit implements ModInitializer {
@@ -13,10 +13,10 @@ public class ExampleInit implements ModInitializer {
         AutoConfig.register(
             CONFIG,
             ExampleConfig.class,
-            (name, configClass) -> new ModularSerializer<>(
+            (name, configClass) -> new PartitioningSerializer<>(
                 name,
                 configClass,
-                DummyConfigSerializer::new
+                JanksonConfigSerializer::new
             )
         );
     }

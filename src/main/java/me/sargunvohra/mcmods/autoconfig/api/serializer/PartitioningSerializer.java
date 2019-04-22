@@ -6,22 +6,21 @@ import me.sargunvohra.mcmods.autoconfig.impl.Utils;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class ModularSerializer
-    <T extends ModularSerializer.ModularConfigData, M extends ModularSerializer.Module>
-    implements ConfigSerializer<T> {
+public final class PartitioningSerializer<T extends PartitioningSerializer.GlobalData, M extends ConfigData> implements ConfigSerializer<T> {
 
     private Class<T> configClass;
     private Map<Field, ConfigSerializer<M>> serializers;
 
-    public ModularSerializer(String name, Class<T> configClass, ConfigSerializer.Factory<M> factory) {
+    public PartitioningSerializer(String name, Class<T> configClass, ConfigSerializer.Factory<M> factory) {
         this.configClass = configClass;
 
         //noinspection unchecked
-        serializers = Arrays.stream(configClass.getDeclaredFields())
-            .filter(field -> Module.class.isAssignableFrom(field.getType()))
+        serializers = getModuleFields(configClass).stream()
             .collect(
                 Utils.toLinkedMap(
                     Function.identity(),
@@ -31,6 +30,16 @@ public class ModularSerializer
                     )
                 )
             );
+    }
+
+    private static boolean isConfigData(Field field) {
+        return ConfigData.class.isAssignableFrom(field.getType());
+    }
+
+    private static List<Field> getModuleFields(Class<?> configClass) {
+        return Arrays.stream(configClass.getDeclaredFields())
+            .filter(PartitioningSerializer::isConfigData)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -54,17 +63,21 @@ public class ModularSerializer
         return Utils.constructUnsafely(configClass);
     }
 
-    public interface ModularConfigData extends ConfigData {
+    public static abstract class GlobalData implements ConfigData {
+
+        public GlobalData() {
+            Arrays.stream(getClass().getDeclaredFields())
+                .filter(field -> !isConfigData(field))
+                .forEach(field -> {
+                    throw new RuntimeException(String.format("Field %s is not ConfigData!", field));
+                });
+        }
+
         @Override
-        default void validatePostLoad() throws ValidationException {
-            for (Field field : getClass().getDeclaredFields()) {
-                if (Module.class.isAssignableFrom(field.getType())) {
-                    ((Module) Utils.getUnsafely(field, this)).validatePostLoad();
-                }
+        final public void validatePostLoad() throws ValidationException {
+            for (Field moduleField : getModuleFields(getClass())) {
+                ((ConfigData) Utils.getUnsafely(moduleField, this)).validatePostLoad();
             }
         }
-    }
-
-    public interface Module extends ConfigData {
     }
 }

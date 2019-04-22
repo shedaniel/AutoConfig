@@ -1,10 +1,14 @@
 package me.sargunvohra.mcmods.autoconfig.example;
 
+import me.sargunvohra.mcmods.autoconfig.api.ConfigData;
 import me.sargunvohra.mcmods.autoconfig.api.ConfigGuiEntry;
-import me.sargunvohra.mcmods.autoconfig.api.serializer.ModularSerializer;
+import me.sargunvohra.mcmods.autoconfig.api.serializer.PartitioningSerializer;
+
+import java.util.Arrays;
+import java.util.List;
 
 @SuppressWarnings("unused")
-public class ExampleConfig implements ModularSerializer.ModularConfigData {
+public class ExampleConfig extends PartitioningSerializer.GlobalData {
 
     @ConfigGuiEntry(category = "a")
     @ConfigGuiEntry.Transitive
@@ -18,7 +22,7 @@ public class ExampleConfig implements ModularSerializer.ModularConfigData {
         FOO, BAR, BAZ
     }
 
-    private static class ModuleA implements ModularSerializer.Module {
+    private static class ModuleA implements ConfigData {
 
         private boolean aBoolean = true;
 
@@ -30,7 +34,7 @@ public class ExampleConfig implements ModularSerializer.ModularConfigData {
         private TwoInts anObject = new TwoInts(1, 2);
     }
 
-    private static class ModuleB implements ModularSerializer.Module {
+    private static class ModuleB implements ConfigData {
 
         @ConfigGuiEntry.IntSlider(min = -1000, max = 2000)
         private int intSlider = 500;
@@ -40,6 +44,24 @@ public class ExampleConfig implements ModularSerializer.ModularConfigData {
 
         @ConfigGuiEntry.Transitive
         private TwoInts anObject = new TwoInts(3, 4);
+
+        @ConfigGuiEntry.Exclude
+        private List<ListItem> aList = Arrays.asList(new ListItem(), new ListItem(3, 4));
+    }
+
+    private static class ListItem {
+        private int foo;
+        private int bar;
+
+        public ListItem() {
+            foo = 1;
+            bar = 2;
+        }
+
+        public ListItem(int foo, int bar) {
+            this.foo = foo;
+            this.bar = bar;
+        }
     }
 
     private static class TwoInts {

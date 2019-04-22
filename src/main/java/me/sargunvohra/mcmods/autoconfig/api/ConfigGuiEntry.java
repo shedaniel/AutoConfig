@@ -31,4 +31,9 @@ public @interface ConfigGuiEntry {
     @Target(ElementType.FIELD)
     @interface Transitive {
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    @interface Exclude {
+    }
 }

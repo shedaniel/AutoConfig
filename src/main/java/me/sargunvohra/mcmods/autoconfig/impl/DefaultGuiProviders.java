@@ -26,6 +26,11 @@ public class DefaultGuiProviders {
     public static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
 
         registry.registerForAnnotations(
+            (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
+            Exclude.class
+        );
+
+        registry.registerForAnnotations(
             (i13n, field, config, defaults, guiProvider) -> {
                 IntSlider slider = field.getAnnotation(IntSlider.class);
                 return Collections.singletonList(
