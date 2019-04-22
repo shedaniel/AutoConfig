@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Screen;
 import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -16,17 +17,17 @@ import static java.util.stream.Collectors.groupingBy;
 @Environment(EnvType.CLIENT)
 class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
 
-    private ConfigManager<T> manager;
-    private ConfigGuiProvider guiProvider;
-    private Screen parent;
+    private final ConfigManager<T> manager;
+    private final ConfigGuiProviderTransformer registry;
+    private final Screen parent;
 
     ConfigScreenProvider(
         ConfigManager<T> manager,
-        ConfigGuiProvider guiProvider,
+        ConfigGuiProviderTransformer registry,
         Screen parent
     ) {
         this.manager = manager;
-        this.guiProvider = guiProvider;
+        this.registry = registry;
         this.parent = parent;
     }
 
@@ -62,11 +63,11 @@ class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
             )
             .forEach(
                 (key, value) -> value.forEach(
-                    field ->
-                        guiProvider.get(
-                            String.format("%s.option.%s", i13n, field.getName()),
-                            field, config, defaults, guiProvider
-                        ).forEach(key::addOption)
+                    field -> {
+                        String optionI13n = String.format("%s.option.%s", i13n, field.getName());
+                        registry.getAndTransform(optionI13n, field, config, defaults, registry)
+                            .forEach(key::addOption);
+                    }
                 )
             );
 

@@ -1,15 +1,14 @@
 package me.sargunvohra.mcmods.autoconfig1;
 
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
+import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.lang.reflect.Field;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class AutoConfig {
@@ -63,13 +62,10 @@ public class AutoConfig {
         //noinspection unchecked
         return new <T>ConfigScreenProvider(
             (ConfigManager<T>) AutoConfig.getConfigHolder(configClass),
-            new ComposedGuiProvider(
+            new ComposedConfigGuiRegistry(
                 getGuiRegistry(configClass),
                 ClientOnly.defaultGuiRegistry,
-                (i13n, field, config, defaults, guiProvider) -> {
-                    LogManager.getLogger().error("No GUI provider registered for field '{}'!", field);
-                    return Collections.emptyList();
-                }
+                new FallbackGuiRegistry()
             ),
             parent
         );
@@ -77,6 +73,7 @@ public class AutoConfig {
 
     @Environment(EnvType.CLIENT)
     private static class ClientOnly {
-        private static final ConfigGuiRegistry defaultGuiRegistry = DefaultGuiProviders.apply(new ConfigGuiRegistry());
+        private static final ConfigGuiRegistry defaultGuiRegistry =
+            DefaultGuiTransformers.apply(DefaultGuiProviders.apply(new ConfigGuiRegistry()));
     }
 }

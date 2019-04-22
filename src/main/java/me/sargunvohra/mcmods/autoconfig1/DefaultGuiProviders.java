@@ -23,12 +23,12 @@ class DefaultGuiProviders {
 
     static ConfigGuiRegistry apply(ConfigGuiRegistry registry) {
 
-        registry.registerForAnnotations(
+        registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
             ConfigEntry.Gui.Excluded.class
         );
 
-        registry.registerForAnnotations(
+        registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> {
                 ConfigEntry.BoundedDiscrete bounds
                     = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
@@ -49,7 +49,7 @@ class DefaultGuiProviders {
             ConfigEntry.BoundedDiscrete.class
         );
 
-        registry.registerForAnnotations(
+        registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> {
                 ConfigEntry.BoundedDiscrete bounds
                     = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
@@ -70,13 +70,13 @@ class DefaultGuiProviders {
             ConfigEntry.BoundedDiscrete.class
         );
 
-        registry.registerForAnnotations(
+        registry.registerAnnotationProvider(
             DefaultGuiProviders::getChildren,
             field -> !field.getType().isPrimitive(),
             ConfigEntry.Gui.TransitiveObject.class
         );
 
-        registry.registerForAnnotations(
+        registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new SubCategoryListEntry(
                     i13n,
@@ -89,7 +89,7 @@ class DefaultGuiProviders {
         );
 
         //noinspection unchecked
-        registry.registerForPredicate(
+        registry.registerPredicateProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new EnumListEntry(
                     i13n,
@@ -103,7 +103,7 @@ class DefaultGuiProviders {
             field -> field.getType().isEnum()
         );
 
-        registry.registerForTypes(
+        registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new BooleanListEntry(
                     i13n,
@@ -116,7 +116,7 @@ class DefaultGuiProviders {
             boolean.class, Boolean.class
         );
 
-        registry.registerForTypes(
+        registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new IntegerListEntry(
                     i13n,
@@ -129,7 +129,7 @@ class DefaultGuiProviders {
             int.class, Integer.class
         );
 
-        registry.registerForTypes(
+        registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new LongListEntry(
                     i13n,
@@ -142,7 +142,7 @@ class DefaultGuiProviders {
             long.class, Long.class
         );
 
-        registry.registerForTypes(
+        registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new FloatListEntry(
                     i13n,
@@ -155,7 +155,7 @@ class DefaultGuiProviders {
             float.class, Float.class
         );
 
-        registry.registerForTypes(
+        registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new DoubleListEntry(
                     i13n,
@@ -168,7 +168,7 @@ class DefaultGuiProviders {
             double.class, Double.class
         );
 
-        registry.registerForTypes(
+        registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 new StringListEntry(
                     i13n,
@@ -184,7 +184,7 @@ class DefaultGuiProviders {
         return registry;
     }
 
-    private static List<ClothConfigScreen.AbstractListEntry> getChildren(String i13n, Field field, Object config, Object defaults, ConfigGuiProvider guiProvider) {
+    private static List<ClothConfigScreen.AbstractListEntry> getChildren(String i13n, Field field, Object config, Object defaults, ConfigGuiProviderTransformer guiProvider) {
         Object iConfig = getUnsafely(field, config);
         Object iDefaults = getUnsafely(field, defaults);
 
@@ -192,7 +192,7 @@ class DefaultGuiProviders {
             .map(
                 iField -> {
                     String iI13n = String.format("%s.%s", i13n, iField.getName());
-                    return guiProvider.get(iI13n, iField, iConfig, iDefaults, guiProvider);
+                    return guiProvider.getAndTransform(iI13n, iField, iConfig, iDefaults, guiProvider);
                 }
             )
             .filter(Objects::nonNull)

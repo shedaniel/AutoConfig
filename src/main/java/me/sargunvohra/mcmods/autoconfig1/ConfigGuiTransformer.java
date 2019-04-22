@@ -9,8 +9,9 @@ import java.util.List;
 
 @FunctionalInterface
 @Environment(EnvType.CLIENT)
-public interface ConfigGuiProvider {
-    List<ClothConfigScreen.AbstractListEntry> get(
+public interface ConfigGuiTransformer {
+    List<ClothConfigScreen.AbstractListEntry> transform(
+        List<ClothConfigScreen.AbstractListEntry> guis,
         String i13n,
         Field field,
         Object config,

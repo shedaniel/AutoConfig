@@ -35,6 +35,7 @@ public class ConfigEntry {
     /**
      * Applies to float and double fields.
      * In a future version it will enforce bounds at deserialization.
+     * Does nothing right now.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
@@ -76,12 +77,20 @@ public class ConfigEntry {
         }
 
         /**
-         * Applies to objects.
-         * Sets the object's tree to be expanded by default.
+         * Applies a tooltip to list entries that support it, defined in your lang file.
          */
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.FIELD)
-        public @interface StartExpanded {
+        public @interface Tooltip {
+            int count() default 1;
+        }
+
+        /**
+         * Applies a section of text right before this entry, defined in your lang file.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface PrefixText {
         }
     }
 }

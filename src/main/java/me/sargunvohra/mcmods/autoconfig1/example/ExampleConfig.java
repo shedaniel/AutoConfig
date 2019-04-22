@@ -26,8 +26,10 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
     private static class ModuleA implements ConfigData {
 
+        @ConfigEntry.Gui.PrefixText
         private boolean aBoolean = true;
 
+        @ConfigEntry.Gui.Tooltip(count = 2)
         private ExampleEnum anEnum = ExampleEnum.FOO;
 
         private String aString = "hello";
