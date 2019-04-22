@@ -1,6 +1,7 @@
 package me.sargunvohra.mcmods.autoconfig1;
 
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
+import me.sargunvohra.mcmods.autoconfig1.serializer.ConfigSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

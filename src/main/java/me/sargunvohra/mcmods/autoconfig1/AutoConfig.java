@@ -7,6 +7,7 @@ import me.sargunvohra.mcmods.autoconfig1.gui.DefaultGuiTransformers;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.DefaultGuiRegistryAccess;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.ComposedGuiRegistryAccess;
+import me.sargunvohra.mcmods.autoconfig1.serializer.ConfigSerializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;

@@ -3,7 +3,6 @@ package me.sargunvohra.mcmods.autoconfig1.serializer;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
 import me.sargunvohra.mcmods.autoconfig1.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1.ConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.util.Utils;
 import net.fabricmc.loader.api.FabricLoader;

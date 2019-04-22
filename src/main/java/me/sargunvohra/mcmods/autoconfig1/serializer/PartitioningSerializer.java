@@ -1,7 +1,6 @@
 package me.sargunvohra.mcmods.autoconfig1.serializer;
 
 import me.sargunvohra.mcmods.autoconfig1.ConfigData;
-import me.sargunvohra.mcmods.autoconfig1.ConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.util.Utils;
 
@@ -33,7 +32,13 @@ public final class PartitioningSerializer<T extends PartitioningSerializer.Globa
                 Utils.toLinkedMap(
                     Function.identity(),
                     field -> factory.create(
-                        createDefinition(String.format("%s/%s", definition.name(), field.getName())),
+                        createDefinition(
+                            String.format(
+                                "%s/%s",
+                                definition.name(),
+                                field.getType().getAnnotation(Config.class).name()
+                            )
+                        ),
                         (Class<M>) field.getType()
                     )
                 )
@@ -70,13 +75,14 @@ public final class PartitioningSerializer<T extends PartitioningSerializer.Globa
         };
     }
 
-    private static boolean isConfigData(Field field) {
-        return ConfigData.class.isAssignableFrom(field.getType());
+    private static boolean isValidModule(Field field) {
+        return ConfigData.class.isAssignableFrom(field.getType())
+            && field.getType().isAnnotationPresent(Config.class);
     }
 
     private static List<Field> getModuleFields(Class<?> configClass) {
         return Arrays.stream(configClass.getDeclaredFields())
-            .filter(PartitioningSerializer::isConfigData)
+            .filter(PartitioningSerializer::isValidModule)
             .collect(Collectors.toList());
     }
 
@@ -105,9 +111,9 @@ public final class PartitioningSerializer<T extends PartitioningSerializer.Globa
 
         public GlobalData() {
             Arrays.stream(getClass().getDeclaredFields())
-                .filter(field -> !isConfigData(field))
+                .filter(field -> !isValidModule(field))
                 .forEach(field -> {
-                    throw new RuntimeException(String.format("Field %s is not ConfigData!", field));
+                    throw new RuntimeException(String.format("Invalid module: %s", field));
                 });
         }
 

@@ -26,6 +26,7 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
         FOO, BAR, BAZ
     }
 
+    @Config(name = "module_a")
     private static class ModuleA implements ConfigData {
 
         @ConfigEntry.Gui.PrefixText
@@ -41,6 +42,7 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
         private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
     }
 
+    @Config(name = "module_b")
     private static class ModuleB implements ConfigData {
 
         @ConfigEntry.BoundedDiscrete(min = -1000, max = 2000)
