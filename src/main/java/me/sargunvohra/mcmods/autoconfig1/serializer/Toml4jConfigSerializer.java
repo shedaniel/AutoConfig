@@ -19,10 +19,17 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
 
     private Config definition;
     private Class<T> configClass;
+    private TomlWriter tomlWriter;
 
-    public Toml4jConfigSerializer(Config definition, Class<T> configClass) {
+    @SuppressWarnings("WeakerAccess")
+    public Toml4jConfigSerializer(Config definition, Class<T> configClass, TomlWriter tomlWriter) {
         this.definition = definition;
         this.configClass = configClass;
+        this.tomlWriter = tomlWriter;
+    }
+
+    public Toml4jConfigSerializer(Config definition, Class<T> configClass) {
+        this(definition, configClass, new TomlWriter());
     }
 
     private Path getConfigPath() {
@@ -34,8 +41,7 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
         Path configPath = getConfigPath();
         try {
             Files.createDirectories(configPath.getParent());
-            TomlWriter writer = new TomlWriter();
-            writer.write(config, configPath.toFile());
+            tomlWriter.write(config, configPath.toFile());
         } catch (IOException e) {
             throw new SerializationException(e);
         }
