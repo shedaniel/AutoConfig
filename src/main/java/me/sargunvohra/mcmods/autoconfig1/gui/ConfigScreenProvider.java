@@ -73,14 +73,17 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
                         if (field.isAnnotationPresent(ConfigEntry.Category.class))
                             categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
 
-                        ConfigScreenBuilder.CategoryBuilder category =
-                            builder.addCategory(String.format("%s.category.%s", i13n, categoryName));
+                        String categoryKey = String.format("%s.category.%s", i13n, categoryName);
 
-                        if (categoryBackgrounds.containsKey(categoryName)) {
-                            category.setBackgroundTexture(categoryBackgrounds.get(categoryName));
+                        if (!builder.hasCategory(categoryKey)) {
+                            ConfigScreenBuilder.CategoryBuilder category = builder.addCategory(categoryKey);
+                            if (categoryBackgrounds.containsKey(categoryKey)) {
+                                category.setBackgroundTexture(categoryBackgrounds.get(categoryName));
+                            }
+                            return category;
                         }
 
-                        return category;
+                        return builder.getCategory(categoryKey);
                     }
                 )
             )
