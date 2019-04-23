@@ -20,6 +20,9 @@
         "main": [
             "me.sargunvohra.mcmods.autoconfig1.example.ExampleInit"
         ],
+        "client": [
+            "me.sargunvohra.mcmods.autoconfig1.example.ExampleInit"
+        ],
         "modmenu": [
             "me.sargunvohra.mcmods.autoconfig1.example.ExampleModMenuCompat"
         ]
