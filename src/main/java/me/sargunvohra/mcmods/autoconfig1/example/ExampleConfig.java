@@ -12,6 +12,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 @Config(name = "autoconfig_example")
 @Config.Gui.Background("minecraft:textures/block/oak_planks.png")
+@Config.Gui.CategoryBackground(category = "b", background = "minecraft:textures/block/stone.png")
 class ExampleConfig extends PartitioningSerializer.GlobalData {
 
     @ConfigEntry.Category("a")

@@ -1,9 +1,6 @@
 package me.sargunvohra.mcmods.autoconfig1.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Attach this to your config POJO.
@@ -25,6 +22,26 @@ public @interface Config {
         @Target(ElementType.TYPE)
         public @interface Background {
             String value();
+        }
+
+        /**
+         * Sets the background of a specific category in the config GUI
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.TYPE)
+        @Repeatable(CategoryBackgrounds.class)
+        public @interface CategoryBackground {
+            String category();
+            String background();
+        }
+
+        /**
+         * Do not use.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.TYPE)
+        public @interface CategoryBackgrounds {
+            @SuppressWarnings("unused") CategoryBackground[] value();
         }
     }
 }

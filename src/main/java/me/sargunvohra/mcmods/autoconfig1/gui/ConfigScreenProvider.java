@@ -5,6 +5,7 @@ import me.sargunvohra.mcmods.autoconfig1.ConfigManager;
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
+import me.shedaniel.cloth.api.ConfigScreenBuilder;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -12,9 +13,11 @@ import net.minecraft.client.gui.Screen;
 import net.minecraft.util.Identifier;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
 
 @Environment(EnvType.CLIENT)
 public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
@@ -52,14 +55,32 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
             builder.setBackgroundTexture(bgId);
         }
 
+        Map<String, Identifier> categoryBackgrounds =
+            Arrays.stream(configClass.getAnnotationsByType(Config.Gui.CategoryBackground.class))
+                .collect(
+                    toMap(
+                        Config.Gui.CategoryBackground::category,
+                        ann -> new Identifier(ann.background())
+                    )
+                );
+
         Arrays.stream(configClass.getDeclaredFields())
             .collect(
                 groupingBy(
                     field -> {
-                        String category = "default";
+                        String categoryName = "default";
+
                         if (field.isAnnotationPresent(ConfigEntry.Category.class))
-                            category = field.getAnnotation(ConfigEntry.Category.class).value();
-                        return builder.addCategory(String.format("%s.category.%s", i13n, category));
+                            categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
+
+                        ConfigScreenBuilder.CategoryBuilder category =
+                            builder.addCategory(String.format("%s.category.%s", i13n, categoryName));
+
+                        if (categoryBackgrounds.containsKey(categoryName)) {
+                            category.setBackgroundTexture(categoryBackgrounds.get(categoryName));
+                        }
+
+                        return category;
                     }
                 )
             )
