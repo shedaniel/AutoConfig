@@ -15,7 +15,7 @@ build:
     policy: push
     paths:
       - build
-      - ~/.gradle
+      - /root/.gradle
 
 
 test:
@@ -26,5 +26,5 @@ test:
     policy: pull
     paths:
       - build
-      - .gradle
+      - /root/.gradle
 
