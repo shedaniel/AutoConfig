@@ -77,7 +77,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
 
                         if (!builder.hasCategory(categoryKey)) {
                             ConfigScreenBuilder.CategoryBuilder category = builder.addCategory(categoryKey);
-                            if (categoryBackgrounds.containsKey(categoryKey)) {
+                            if (categoryBackgrounds.containsKey(categoryName)) {
                                 category.setBackgroundTexture(categoryBackgrounds.get(categoryName));
                             }
                             return category;

@@ -19,6 +19,10 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
     @ConfigEntry.Gui.TransitiveObject
     ModuleA moduleA = new ModuleA();
 
+    @ConfigEntry.Category("a")
+    @ConfigEntry.Gui.TransitiveObject
+    Empty empty = new Empty();
+
     @ConfigEntry.Category("b")
     @ConfigEntry.Gui.TransitiveObject
     ModuleB moduleB = new ModuleB();
@@ -57,6 +61,11 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
         @ConfigEntry.Gui.Excluded
         private List<PairOfInts> aList = Arrays.asList(new PairOfInts(), new PairOfInts(3, 4));
+    }
+
+    @Config(name = "empty")
+    private static class Empty implements ConfigData {
+
     }
 
     private static class PairOfInts {

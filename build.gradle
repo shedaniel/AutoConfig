@@ -4,13 +4,14 @@ plugins {
     id "com.palantir.git-version" version "0.11.0"
     id 'com.github.johnrengelman.shadow' version '5.0.0'
     id 'java'
+    id 'com.matthewprenger.cursegradle' version '1.2.0'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 archivesBaseName = project.archives_base_name
-version = "${gitVersion()}+mc${project.minecraft_normalized_version}"
+version = "${gitVersion()}+mc${project.minecraft_version}"
 group = project.maven_group
 
 minecraft {
@@ -30,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    shadow ("blue.endless:jankson:${project.jankson_version}") { transitive = false }
+    shadow("blue.endless:jankson:${project.jankson_version}") { transitive = false }
     implementation "blue.endless:jankson:${project.jankson_version}"
 
     shadow("com.moandjiezana.toml:toml4j:${project.toml4j_version}") { transitive = false }
@@ -63,16 +64,10 @@ processResources {
     }
 }
 
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
 
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
 task sourcesJar(type: Jar, dependsOn: classes) {
     archiveClassifier.set("sources")
     from sourceSets.main.allSource
@@ -94,11 +89,9 @@ remapJar {
     jar = shadowJar.archiveFile.get().asFile
 }
 
-// configure the maven publication
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            // add all the jars that should be included when publishing to maven
             artifact(jar) {
                 builtBy remapJar
             }
@@ -108,7 +101,6 @@ publishing {
         }
     }
 
-    // select the repositories you want to publish to
     repositories {
         if (project.hasProperty('publish_maven_url')) {
             maven {
@@ -119,7 +111,29 @@ publishing {
                 }
             }
         }
-        // uncomment to publish to the local maven
-        // mavenLocal()
     }
+}
+
+curseforge {
+    if (project.hasProperty('curseforge_api_key')) {
+        apiKey = curseforge_api_key
+    }
+    project {
+        id = '319839'
+        changelog = file('changelog.txt')
+        releaseType = 'release'
+        addGameVersion '1.14-Snapshot'
+        relations {
+            embeddedLibrary 'fabric'
+            embeddedLibrary 'cloth-config'
+            embeddedLibrary 'auto-config'
+        }
+        options {
+            forgeGradleIntegration = false
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.curseforge319839.dependsOn remapJar
 }

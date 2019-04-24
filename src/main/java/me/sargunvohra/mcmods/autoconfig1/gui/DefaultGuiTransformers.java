@@ -5,15 +5,14 @@ import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
 import me.shedaniel.cloth.gui.ClothConfigScreen;
 import me.shedaniel.cloth.gui.entries.TextListEntry;
+import me.shedaniel.cloth.gui.entries.TooltipListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Language;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -62,6 +61,7 @@ public class DefaultGuiTransformers {
                     }
                 })
                 .collect(Collectors.toList()),
+            field -> !field.isAnnotationPresent(ConfigEntry.Gui.Tooltip.class),
             Comment.class
         );
 
@@ -78,28 +78,10 @@ public class DefaultGuiTransformers {
         return registry;
     }
 
-    private static Field findTooltipField(Class<?> cls) throws NoSuchFieldException {
-        Class<?> current = cls;
-        NoSuchFieldException firstException;
-        do {
-            try {
-                return current.getDeclaredField("tooltipSupplier");
-            } catch (NoSuchFieldException e) {
-                firstException = e;
-            }
-        } while ((current = current.getSuperclass()) != null);
-        throw firstException;
-    }
-
     private static void tryApplyTooltip(ClothConfigScreen.AbstractListEntry gui, String[] text) {
-        // yeah this is a really dirty hack
-        // hoping for https://github.com/shedaniel/Cloth/issues/11 to clean it up
-        try {
-            Field f = findTooltipField(gui.getClass());
-            f.setAccessible(true);
-            f.set(gui, (Supplier<Optional<String[]>>) () -> Optional.of(text));
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
-            e.printStackTrace();
+        if (gui instanceof TooltipListEntry) {
+            TooltipListEntry tooltipGui = (TooltipListEntry) gui;
+            tooltipGui.setTooltipSupplier(() -> Optional.of(text));
         }
     }
 }
