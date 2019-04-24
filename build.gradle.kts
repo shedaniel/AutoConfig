@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.Options
+import com.palantir.gradle.gitversion.VersionDetails
 import net.fabricmc.loom.task.RemapJar
 import net.fabricmc.loom.task.RemapSourcesJar
 
@@ -48,6 +49,8 @@ repositories {
 }
 
 val gitVersion: groovy.lang.Closure<Any> by extra
+val versionDetails: groovy.lang.Closure<VersionDetails> by extra
+
 version = "${gitVersion()}+mc$minecraftVersion"
 group = modMavenGroup
 
@@ -108,48 +111,52 @@ val remapJar = tasks.getByName<RemapJar>("remapJar") {
 
 val remapSourcesJar = tasks.getByName<RemapSourcesJar>("remapSourcesJar")
 
-publishing {
-    publications {
-        register("mavenJava", MavenPublication::class) {
-            artifact(jar) {
-                builtBy(remapJar)
-            }
-            artifact(sourcesJar.get()) {
-                builtBy(remapSourcesJar)
+if (versionDetails().isCleanTag) {
+
+    publishing {
+        publications {
+            register("mavenJava", MavenPublication::class) {
+                artifact(jar) {
+                    builtBy(remapJar)
+                }
+                artifact(sourcesJar.get()) {
+                    builtBy(remapSourcesJar)
+                }
             }
         }
-    }
 
-    repositories {
-        if (project.hasProperty("publish_maven_s3_url")) {
-            maven {
-                setUrl(project.property("publish_maven_s3_url")!!)
-                credentials(AwsCredentials::class) {
-                    accessKey = project.property("publish_maven_s3_access_key") as String
-                    secretKey = project.property("publish_maven_s3_secret_key") as String
+        repositories {
+            if (project.hasProperty("publish_maven_s3_url")) {
+                maven {
+                    setUrl(project.property("publish_maven_s3_url")!!)
+                    credentials(AwsCredentials::class) {
+                        accessKey = project.property("publish_maven_s3_access_key") as String
+                        secretKey = project.property("publish_maven_s3_secret_key") as String
+                    }
                 }
             }
         }
     }
-}
 
-curseforge {
-    if (project.hasProperty("curseforge_api_key")) {
-        apiKey = project.property("curseforge_api_key")!!
+    curseforge {
+        if (project.hasProperty("curseforge_api_key")) {
+            apiKey = project.property("curseforge_api_key")!!
+        }
+
+        project(closureOf<CurseProject> {
+            id = curseProjectId
+            changelog = file("changelog.txt")
+            releaseType = "release"
+            addGameVersion(curseMinecraftVersion)
+        })
+
+        options(closureOf<Options> {
+            forgeGradleIntegration = false
+        })
     }
 
-    project(closureOf<CurseProject> {
-        id = curseProjectId
-        changelog = file("changelog.txt")
-        releaseType = "release"
-        addGameVersion(curseMinecraftVersion)
-    })
+    afterEvaluate {
+        tasks.getByName("curseforge$curseProjectId").dependsOn(remapJar)
+    }
 
-    options(closureOf<Options> {
-        forgeGradleIntegration = false
-    })
-}
-
-afterEvaluate {
-    tasks.getByName("curseforge$curseProjectId").dependsOn(remapJar)
 }
