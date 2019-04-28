@@ -2,6 +2,7 @@ package me.sargunvohra.mcmods.autoconfig1.serializer;
 
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.impl.SyntaxError;
+import com.google.gson.Gson;
 import me.sargunvohra.mcmods.autoconfig1.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1.util.Utils;
@@ -22,14 +23,25 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
     private Class<T> configClass;
     private Jankson jankson;
 
-    @SuppressWarnings("WeakerAccess")
-    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson) {
+    // we need a gson to work around jankson's fromJson bug
+    private Gson gson;
+
+    @Deprecated
+    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson, Gson gson) {
         this.definition = definition;
         this.configClass = configClass;
         this.jankson = jankson;
+        this.gson = gson;
+    }
+
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson) {
+        this(definition, configClass, jankson, new Gson());
     }
 
     public JanksonConfigSerializer(Config definition, Class<T> configClass) {
+        //noinspection deprecation
         this(definition, configClass, Jankson.builder().build());
     }
 
@@ -55,7 +67,7 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
         Path configPath = getConfigPath();
         if (Files.exists(configPath)) {
             try {
-                return jankson.fromJson(jankson.load(getConfigPath().toFile()), configClass);
+                return gson.fromJson(jankson.load(getConfigPath().toFile()).toJson(false, false), configClass);
             } catch (IOException | SyntaxError e) {
                 throw new SerializationException(e);
             }
