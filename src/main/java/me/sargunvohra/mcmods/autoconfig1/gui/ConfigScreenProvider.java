@@ -12,12 +12,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
 import net.minecraft.util.Identifier;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 
 @Environment(EnvType.CLIENT)
 public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
@@ -67,24 +68,9 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         Arrays.stream(configClass.getDeclaredFields())
             .collect(
                 groupingBy(
-                    field -> {
-                        String categoryName = "default";
-
-                        if (field.isAnnotationPresent(ConfigEntry.Category.class))
-                            categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
-
-                        String categoryKey = String.format("%s.category.%s", i13n, categoryName);
-
-                        if (!builder.hasCategory(categoryKey)) {
-                            ConfigScreenBuilder.CategoryBuilder category = builder.addCategory(categoryKey);
-                            if (categoryBackgrounds.containsKey(categoryName)) {
-                                category.setBackgroundTexture(categoryBackgrounds.get(categoryName));
-                            }
-                            return category;
-                        }
-
-                        return builder.getCategory(categoryKey);
-                    }
+                    field -> getOrCreateCategoryForField(field, builder, categoryBackgrounds, i13n),
+                    LinkedHashMap::new,
+                    toList()
                 )
             )
             .forEach(
@@ -98,5 +84,29 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
             );
 
         return builder.build();
+    }
+
+    private ConfigScreenBuilder.CategoryBuilder getOrCreateCategoryForField(
+        Field field,
+        ClothConfigScreen.Builder screenBuilder,
+        Map<String, Identifier> backgroundMap,
+        String baseI13n
+    ) {
+        String categoryName = "default";
+
+        if (field.isAnnotationPresent(ConfigEntry.Category.class))
+            categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
+
+        String categoryKey = String.format("%s.category.%s", baseI13n, categoryName);
+
+        if (!screenBuilder.hasCategory(categoryKey)) {
+            ConfigScreenBuilder.CategoryBuilder category = screenBuilder.addCategory(categoryKey);
+            if (backgroundMap.containsKey(categoryName)) {
+                category.setBackgroundTexture(backgroundMap.get(categoryName));
+            }
+            return category;
+        }
+
+        return screenBuilder.getCategory(categoryKey);
     }
 }
