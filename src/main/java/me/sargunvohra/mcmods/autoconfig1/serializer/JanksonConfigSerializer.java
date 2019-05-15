@@ -23,25 +23,13 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
     private Class<T> configClass;
     private Jankson jankson;
 
-    // we need a gson to work around jankson's fromJson bug
-    private Gson gson;
-
-    @Deprecated
-    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson, Gson gson) {
+    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson) {
         this.definition = definition;
         this.configClass = configClass;
         this.jankson = jankson;
-        this.gson = gson;
-    }
-
-    @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    public JanksonConfigSerializer(Config definition, Class<T> configClass, Jankson jankson) {
-        this(definition, configClass, jankson, new Gson());
     }
 
     public JanksonConfigSerializer(Config definition, Class<T> configClass) {
-        //noinspection deprecation
         this(definition, configClass, Jankson.builder().build());
     }
 
@@ -67,7 +55,7 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
         Path configPath = getConfigPath();
         if (Files.exists(configPath)) {
             try {
-                return gson.fromJson(jankson.load(getConfigPath().toFile()).toJson(false, false), configClass);
+                return jankson.fromJson(jankson.load(getConfigPath().toFile()), configClass);
             } catch (IOException | SyntaxError e) {
                 throw new SerializationException(e);
             }

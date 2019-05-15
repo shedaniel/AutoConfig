@@ -1,0 +1,3 @@
+* Update to MC 1.14.1
+* Update to modular fabric api
+* Update jankson and remove workaround for jankson bug

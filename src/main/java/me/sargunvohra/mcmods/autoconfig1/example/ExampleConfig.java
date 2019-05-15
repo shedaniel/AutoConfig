@@ -68,13 +68,13 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
     }
 
+    @SuppressWarnings("FieldCanBeLocal")
     private static class PairOfInts {
         private int foo;
         private int bar;
 
         PairOfInts() {
-            foo = 1;
-            bar = 2;
+            this(1, 2);
         }
 
         PairOfInts(int foo, int bar) {
@@ -90,6 +90,10 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
         @ConfigEntry.Gui.CollapsibleObject()
         PairOfInts second;
+
+        PairOfIntPairs() {
+            this(new PairOfInts(), new PairOfInts());
+        }
 
         PairOfIntPairs(PairOfInts first, PairOfInts second) {
             this.first = first;

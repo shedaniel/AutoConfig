@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Screen;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("unused") // entrypoint
@@ -18,7 +19,7 @@ public class ExampleModMenuCompat implements ModMenuApi {
     }
 
     @Override
-    public Optional<Supplier<Screen>> getConfigScreen(Screen screen) {
-        return Optional.of(AutoConfig.getConfigScreen(ExampleConfig.class, screen));
+    public Function<Screen, ? extends Screen> getConfigScreenFactory() {
+        return screen -> AutoConfig.getConfigScreen(ExampleConfig.class, screen).get();
     }
 }

@@ -52,7 +52,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
 
         if (configClass.isAnnotationPresent(Config.Gui.Background.class)) {
             String bg = configClass.getAnnotation(Config.Gui.Background.class).value();
-            Identifier bgId = Identifier.create(bg);
+            Identifier bgId = Identifier.ofNullable(bg);
             builder.setBackgroundTexture(bgId);
         }
 
