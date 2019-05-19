@@ -6,20 +6,12 @@ import net.fabricmc.loom.task.RemapJar
 import net.fabricmc.loom.task.RemapSourcesJar
 
 val minecraftVersion: String by project
-val yarnMappings: String by project
-val loaderVersion: String by project
 
 val curseProjectId: String by project
 val curseMinecraftVersion: String by project
 val basePackage: String by project
 val modJarBaseName: String by project
 val modMavenGroup: String by project
-
-val janksonVersion: String by project
-val toml4jVersion: String by project
-val fabricVersion: String by project
-val clothConfigVersion: String by project
-val modMenuVersion: String by project
 
 plugins {
     java
@@ -57,23 +49,31 @@ group = modMavenGroup
 minecraft {
 }
 
-dependencies {
-    shadow("blue.endless:jankson:$janksonVersion")
-    implementation("blue.endless:jankson:$janksonVersion")
+configurations {
+    listOf(shadow, implementation, mappings, modCompile, include).forEach {
+        it {
+            resolutionStrategy.activateDependencyLocking()
+        }
+    }
+}
 
-    shadow("com.moandjiezana.toml:toml4j:$toml4jVersion") {
+dependencies {
+    shadow("blue.endless:jankson:1.1.+")
+    implementation("blue.endless:jankson:1.1.+")
+
+    shadow("com.moandjiezana.toml:toml4j:0.7.+") {
         exclude(group = "com.google.code.gson", module = "gson")
     }
-    implementation("com.moandjiezana.toml:toml4j:$toml4jVersion")
+    implementation("com.moandjiezana.toml:toml4j:0.7.+")
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings("net.fabricmc:yarn:$minecraftVersion+$yarnMappings")
-    modCompile("net.fabricmc:fabric-loader:$loaderVersion")
+    mappings("net.fabricmc:yarn:$minecraftVersion+")
+    modCompile("net.fabricmc:fabric-loader:0.4.+")
 
-    modCompile("net.fabricmc.fabric-api:fabric-api-base:$fabricVersion")
-    modCompile("net.fabricmc.fabric-api:fabric-resource-loader:$fabricVersion")
-    modCompile("cloth-config:ClothConfig:$clothConfigVersion")
-    modCompile("io.github.prospector.modmenu:ModMenu:$modMenuVersion")
+    modCompile("net.fabricmc.fabric-api:fabric-api-base:0.+")
+    modCompile("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.+")
+    modCompile("cloth-config:ClothConfig:0.2.1.14")
+    modCompile("io.github.prospector.modmenu:ModMenu:1.+")
 }
 
 val processResources = tasks.getByName<ProcessResources>("processResources") {
