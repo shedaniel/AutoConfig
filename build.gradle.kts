@@ -153,7 +153,6 @@ if (versionDetails().isCleanTag) {
             relations(closureOf<CurseRelation>{
                 requiredDependency("fabric")
                 requiredDependency("cloth-config")
-                requiredDependency("auto-config")
             })
         })
 
