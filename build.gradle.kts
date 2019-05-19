@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.matthewprenger.cursegradle.CurseProject
+import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.Options
 import com.palantir.gradle.gitversion.VersionDetails
 import net.fabricmc.loom.task.RemapJar
@@ -149,6 +150,11 @@ if (versionDetails().isCleanTag) {
             changelog = file("changelog.txt")
             releaseType = "release"
             addGameVersion(curseMinecraftVersion)
+            relations(closureOf<CurseRelation>{
+                requiredDependency("fabric")
+                requiredDependency("cloth-config")
+                requiredDependency("auto-config")
+            })
         })
 
         options(closureOf<Options> {

@@ -31,7 +31,7 @@
     "requires": {
         "fabricloader": ">=0.4.0",
         "fabric-api-base": ">=0.1.0",
-        "fabric-api-resource-loader": ">=0.1.0",
+        "fabric-api-resource-loader-v0": ">=0.1.0",
         "clothconfig": ">=0.2.0"
     },
     "custom": {
