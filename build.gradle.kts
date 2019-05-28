@@ -3,8 +3,8 @@ import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.Options
 import com.palantir.gradle.gitversion.VersionDetails
-import net.fabricmc.loom.task.RemapJar
-import net.fabricmc.loom.task.RemapSourcesJar
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.task.RemapSourcesJarTask
 
 val minecraftVersion: String by project
 
@@ -18,7 +18,7 @@ plugins {
     java
     idea
     `maven-publish`
-    id("fabric-loom") version "0.2.2-SNAPSHOT"
+    id("fabric-loom") version "0.2.3-SNAPSHOT"
     id("com.palantir.git-version") version "0.11.0"
     id("com.github.johnrengelman.shadow") version "5.0.0"
     id("com.matthewprenger.cursegradle") version "1.2.0"
@@ -94,35 +94,40 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().allSource)
 }
 
-val jar = tasks.getByName<Jar>("jar") {
-    from("LICENSE")
-}
-
 val shadowJar = tasks.getByName<ShadowJar>("shadowJar").apply {
     relocate("blue.endless.jankson", "$basePackage.shadowed.blue.endless.jankson")
     relocate("com.moandjiezana.toml", "$basePackage.shadowed.com.moandjiezana.toml")
 
     configurations = listOf(project.configurations["shadow"])
-    archiveClassifier.set("")
+    archiveClassifier.set("shadow")
 }
 
-val remapJar = tasks.getByName<RemapJar>("remapJar") {
+val jar = tasks.getByName<Jar>("jar") {
+    from("LICENSE")
+}
+
+val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
     dependsOn("shadowJar")
-    jar = shadowJar.archiveFile.get().asFile
+    afterEvaluate {
+        setInput(shadowJar.archiveFile.get().asFile)
+    }
 }
 
-val remapSourcesJar = tasks.getByName<RemapSourcesJar>("remapSourcesJar")
+val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
 
 if (versionDetails().isCleanTag) {
 
     publishing {
+
         publications {
-            register("mavenJava", MavenPublication::class) {
-                artifact(jar) {
-                    builtBy(remapJar)
-                }
-                artifact(sourcesJar.get()) {
-                    builtBy(remapSourcesJar)
+            afterEvaluate {
+                register("mavenJava", MavenPublication::class) {
+                    artifact(remapJar.output) {
+                        builtBy(remapJar)
+                    }
+                    artifact(sourcesJar.get()) {
+                        builtBy(sourcesJar)
+                    }
                 }
             }
         }
@@ -136,6 +141,8 @@ if (versionDetails().isCleanTag) {
                         secretKey = project.property("publish_maven_s3_secret_key") as String
                     }
                 }
+            } else {
+                mavenLocal()
             }
         }
     }
@@ -154,15 +161,16 @@ if (versionDetails().isCleanTag) {
                 requiredDependency("fabric")
                 requiredDependency("cloth-config")
             })
+            mainArtifact(file("${project.buildDir}/libs/${base.archivesBaseName}-$version.jar"))
+            afterEvaluate {
+                uploadTask.dependsOn(remapJar)
+            }
+
         })
 
         options(closureOf<Options> {
             forgeGradleIntegration = false
         })
-    }
-
-    afterEvaluate {
-        tasks.getByName("curseforge$curseProjectId").dependsOn(remapJar)
     }
 
 }

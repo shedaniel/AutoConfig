@@ -7,7 +7,7 @@ io.github.prospector.modmenu:ModMenu:1.5.4-85
 net.fabricmc.fabric-api:fabric-api-base:0.1.0+59147463
 net.fabricmc.fabric-api:fabric-resource-loader-v0:0.1.1+59147463
 net.fabricmc:fabric-loader-sat4j:2.3.5.4
-net.fabricmc:fabric-loader:0.4.7+build.147
+net.fabricmc:fabric-loader:0.4.8+build.154
 net.fabricmc:sponge-mixin:0.7.11.20
 net.fabricmc:tiny-mappings-parser:0.1.1.8
 net.fabricmc:tiny-remapper:0.1.0.33
