@@ -68,13 +68,13 @@ dependencies {
     implementation("com.moandjiezana.toml:toml4j:0.7.+")
 
     minecraft("com.mojang:minecraft:$minecraftVersion")
-    mappings("net.fabricmc:yarn:$minecraftVersion+")
-    modCompile("net.fabricmc:fabric-loader:0.4.+")
+    mappings("net.fabricmc:yarn:$minecraftVersion+build.2")
+    modCompile("net.fabricmc:fabric-loader:0.4.8+build.157")
 
-    modCompile("net.fabricmc.fabric-api:fabric-api-base:0.+")
-    modCompile("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.+")
-    modCompile("cloth-config:ClothConfig:0.2.1.14")
-    modCompile("io.github.prospector.modmenu:ModMenu:1.+")
+    modCompile("net.fabricmc.fabric-api:fabric-api-base:0.1.0+5914746355")
+    modCompile("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.1.1+5914746355")
+    modCompile("cloth-config:ClothConfig:0.2.4.17")
+    modCompile("io.github.prospector.modmenu:ModMenu:1.6+")
 }
 
 val processResources = tasks.getByName<ProcessResources>("processResources") {
@@ -158,7 +158,7 @@ if (versionDetails().isCleanTag) {
             releaseType = "release"
             addGameVersion(curseMinecraftVersion)
             relations(closureOf<CurseRelation>{
-                requiredDependency("fabric")
+                requiredDependency("fabric-api")
                 requiredDependency("cloth-config")
             })
             mainArtifact(file("${project.buildDir}/libs/${base.archivesBaseName}-$version.jar"))

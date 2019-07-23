@@ -1,1 +1,1 @@
-Fix declared dependencies in fabric.mod.json
+Update to MC 1.14.4
