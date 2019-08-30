@@ -38,11 +38,9 @@ base {
 }
 
 repositories {
-    mavenCentral()
-    jcenter()
     maven(url = "http://maven.fabricmc.net/")
     maven(url = "https://minecraft.curseforge.com/api/maven")
-    maven(url = "https://maven.fabricmc.net/io/github/prospector/modmenu/ModMenu/")
+    jcenter()
 }
 
 val gitVersion: groovy.lang.Closure<Any> by extra
@@ -69,7 +67,7 @@ dependencies {
     modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
     modCompile("cloth-config:ClothConfig:0.2.4.17")
-    modCompile("io.github.prospector.modmenu:ModMenu:1.6+")
+    modCompile("io.github.prospector:modmenu:1.7+")
 
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")
@@ -160,7 +158,7 @@ if (versionDetails().isCleanTag) {
             changelog = file("changelog.txt")
             releaseType = "release"
             addGameVersion(minecraft_version)
-            relations(closureOf<CurseRelation>{
+            relations(closureOf<CurseRelation> {
                 requiredDependency("fabric-api")
                 requiredDependency("cloth-config")
             })
