@@ -108,10 +108,8 @@ val jar = tasks.getByName<Jar>("jar") {
 }
 
 val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
-    /*dependsOn("shadowJar")
-    afterEvaluate {
-        setInput(shadowJar.archiveFile.get().asFile)
-    }*/
+    (this as AbstractArchiveTask).dependsOn(shadowJar)
+    this.input.set(shadowJar.archiveFile)
 }
 
 val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
@@ -123,9 +121,7 @@ if (versionDetails().isCleanTag) {
         publications {
             afterEvaluate {
                 register("mavenJava", MavenPublication::class) {
-                    artifact(remapJar) {
-                        builtBy(remapJar)
-                    }
+                    artifact(remapJar)
                     artifact(sourcesJar.get()) {
                         builtBy(sourcesJar)
                     }
@@ -162,7 +158,7 @@ if (versionDetails().isCleanTag) {
                 requiredDependency("fabric-api")
                 requiredDependency("cloth-config")
             })
-            mainArtifact(file("${project.buildDir}/libs/${base.archivesBaseName}-$version.jar"))
+            mainArtifact(remapJar)
             afterEvaluate {
                 uploadTask.dependsOn(remapJar)
             }
