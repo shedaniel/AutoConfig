@@ -1,7 +1,7 @@
 package me.sargunvohra.mcmods.autoconfig1.gui.registry;
 
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
-import me.shedaniel.cloth.gui.ClothConfigScreen;
+import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -20,7 +20,7 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     }
 
     @Override
-    public List<ClothConfigScreen.AbstractListEntry> get(
+    public List<AbstractConfigListEntry> get(
         String i13n,
         Field field,
         Object config,
@@ -34,8 +34,8 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     }
 
     @Override
-    public List<ClothConfigScreen.AbstractListEntry> transform(
-        List<ClothConfigScreen.AbstractListEntry> guis,
+    public List<AbstractConfigListEntry> transform(
+        List<AbstractConfigListEntry> guis,
         String i13n,
         Field field,
         Object config,
