@@ -1,8 +1,8 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-cloth-config:ClothConfig:0.2.4.17
 io.github.prospector:modmenu:1.7.10-unstable.19w35a+build.2
+me.shedaniel.cloth:config-2:1.1.1
 net.fabricmc.fabric-api:fabric-api-base:0.1.0+b494ebeb42
 net.fabricmc.fabric-api:fabric-api:0.3.2+build.218-1.14
 net.fabricmc.fabric-api:fabric-biomes-v1:0.1.0+896c7fbb42

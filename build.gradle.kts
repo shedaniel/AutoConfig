@@ -66,7 +66,7 @@ dependencies {
     modCompile("net.fabricmc:fabric-loader:$loader_version")
     modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modCompile("cloth-config:ClothConfig:0.2.4.17")
+    modCompile("me.shedaniel.cloth:config-2:1.1.1")
     modCompile("io.github.prospector:modmenu:1.7+")
 
     shadow("blue.endless:jankson:1.1.+")
