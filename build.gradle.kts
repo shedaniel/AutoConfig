@@ -1,5 +1,3 @@
-@file:Suppress("PropertyName")
-
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
@@ -8,21 +6,19 @@ import com.palantir.gradle.gitversion.VersionDetails
 import net.fabricmc.loom.task.RemapJarTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
 
+val minecraftVersion: String by project
+
 val curseProjectId: String by project
+val curseMinecraftVersion: String by project
 val basePackage: String by project
 val modJarBaseName: String by project
 val modMavenGroup: String by project
-
-val minecraft_version: String by project
-val yarn_mappings: String by project
-val loader_version: String by project
-val fabric_version: String by project
 
 plugins {
     java
     idea
     `maven-publish`
-    id("fabric-loom") version "0.2.5-SNAPSHOT"
+    id("fabric-loom") version "0.2.3-SNAPSHOT"
     id("com.palantir.git-version") version "0.11.0"
     id("com.github.johnrengelman.shadow") version "5.0.0"
     id("com.matthewprenger.cursegradle") version "1.2.0"
@@ -38,15 +34,17 @@ base {
 }
 
 repositories {
-    maven(url = "http://maven.fabricmc.net/")
-    maven(url = "https://minecraft.curseforge.com/api/maven")
+    mavenCentral()
     jcenter()
+    maven(url = "http://maven.fabricmc.net")
+    maven(url = "https://minecraft.curseforge.com/api/maven")
+    maven(url = "https://maven.fabricmc.net/io/github/prospector/modmenu/ModMenu/")
 }
 
 val gitVersion: groovy.lang.Closure<Any> by extra
 val versionDetails: groovy.lang.Closure<VersionDetails> by extra
 
-version = "${gitVersion()}+mc$minecraft_version"
+version = "${gitVersion()}+mc$minecraftVersion"
 group = modMavenGroup
 
 minecraft {
@@ -61,14 +59,6 @@ configurations {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:$minecraft_version")
-    mappings("net.fabricmc:yarn:$yarn_mappings")
-    modCompile("net.fabricmc:fabric-loader:$loader_version")
-    modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version")
-
-    modCompile("me.shedaniel.cloth:config-2:1.1.1")
-    modCompile("io.github.prospector:modmenu:1.7+")
-
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")
 
@@ -76,6 +66,15 @@ dependencies {
         exclude(group = "com.google.code.gson", module = "gson")
     }
     implementation("com.moandjiezana.toml:toml4j:0.7.+")
+
+    minecraft("com.mojang:minecraft:$minecraftVersion")
+    mappings("net.fabricmc:yarn:$minecraftVersion+build.2")
+    modCompile("net.fabricmc:fabric-loader:0.4.8+build.157")
+
+    modCompile("net.fabricmc.fabric-api:fabric-api-base:0.1.0+5914746355")
+    modCompile("net.fabricmc.fabric-api:fabric-resource-loader-v0:0.1.1+5914746355")
+    modCompile("cloth-config:ClothConfig:0.2.4.17")
+    modCompile("io.github.prospector.modmenu:ModMenu:1.6+")
 }
 
 val processResources = tasks.getByName<ProcessResources>("processResources") {
@@ -108,8 +107,10 @@ val jar = tasks.getByName<Jar>("jar") {
 }
 
 val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
-    (this as AbstractArchiveTask).dependsOn(shadowJar)
-    this.input.set(shadowJar.archiveFile)
+    dependsOn("shadowJar")
+    afterEvaluate {
+        setInput(shadowJar.archiveFile.get().asFile)
+    }
 }
 
 val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
@@ -121,7 +122,9 @@ if (versionDetails().isCleanTag) {
         publications {
             afterEvaluate {
                 register("mavenJava", MavenPublication::class) {
-                    artifact(remapJar)
+                    artifact(remapJar.output) {
+                        builtBy(remapJar)
+                    }
                     artifact(sourcesJar.get()) {
                         builtBy(sourcesJar)
                     }
@@ -153,12 +156,12 @@ if (versionDetails().isCleanTag) {
             id = curseProjectId
             changelog = file("changelog.txt")
             releaseType = "release"
-            addGameVersion(minecraft_version)
-            relations(closureOf<CurseRelation> {
+            addGameVersion(curseMinecraftVersion)
+            relations(closureOf<CurseRelation>{
                 requiredDependency("fabric-api")
                 requiredDependency("cloth-config")
             })
-            mainArtifact(remapJar)
+            mainArtifact(file("${project.buildDir}/libs/${base.archivesBaseName}-$version.jar"))
             afterEvaluate {
                 uploadTask.dependsOn(remapJar)
             }

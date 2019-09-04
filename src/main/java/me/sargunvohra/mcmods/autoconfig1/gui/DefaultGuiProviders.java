@@ -3,8 +3,8 @@ package me.sargunvohra.mcmods.autoconfig1.gui;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.api.GuiRegistryAccess;
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import me.shedaniel.clothconfig2.gui.entries.*;
+import me.shedaniel.cloth.gui.ClothConfigScreen;
+import me.shedaniel.cloth.gui.entries.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -186,7 +186,7 @@ public class DefaultGuiProviders {
         return registry;
     }
 
-    private static List<AbstractConfigListEntry> getChildren(String i13n, Field field, Object config, Object defaults, GuiRegistryAccess guiProvider) {
+    private static List<ClothConfigScreen.AbstractListEntry> getChildren(String i13n, Field field, Object config, Object defaults, GuiRegistryAccess guiProvider) {
         Object iConfig = getUnsafely(field, config);
         Object iDefaults = getUnsafely(field, defaults);
 

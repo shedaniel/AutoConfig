@@ -3,9 +3,9 @@ package me.sargunvohra.mcmods.autoconfig1.gui;
 import blue.endless.jankson.Comment;
 import me.sargunvohra.mcmods.autoconfig1.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1.gui.registry.GuiRegistry;
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
-import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
+import me.shedaniel.cloth.gui.ClothConfigScreen;
+import me.shedaniel.cloth.gui.entries.TextListEntry;
+import me.shedaniel.cloth.gui.entries.TooltipListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.util.Language;
@@ -67,7 +67,7 @@ public class DefaultGuiTransformers {
 
         registry.registerAnnotationTransformer(
             (guis, i13n, field, config, defaults, guiProvider) -> {
-                ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
+                ArrayList<ClothConfigScreen.AbstractListEntry> ret = new ArrayList<>(guis);
                 String text = String.format("%s.%s", i13n, "@PrefixText");
                 ret.add(0, new TextListEntry(text, Language.getInstance().translate(text)));
                 return Collections.unmodifiableList(ret);
@@ -78,7 +78,7 @@ public class DefaultGuiTransformers {
         return registry;
     }
 
-    private static void tryApplyTooltip(AbstractConfigListEntry gui, String[] text) {
+    private static void tryApplyTooltip(ClothConfigScreen.AbstractListEntry gui, String[] text) {
         if (gui instanceof TooltipListEntry) {
             TooltipListEntry tooltipGui = (TooltipListEntry) gui;
             tooltipGui.setTooltipSupplier(() -> Optional.of(text));

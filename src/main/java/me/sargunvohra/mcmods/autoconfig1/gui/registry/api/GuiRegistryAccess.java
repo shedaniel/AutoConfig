@@ -1,6 +1,6 @@
 package me.sargunvohra.mcmods.autoconfig1.gui.registry.api;
 
-import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
+import me.shedaniel.cloth.gui.ClothConfigScreen;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public interface GuiRegistryAccess extends GuiProvider, GuiTransformer {
-    default List<AbstractConfigListEntry> getAndTransform(
+    default List<ClothConfigScreen.AbstractListEntry> getAndTransform(
         String i13n,
         Field field,
         Object config,
