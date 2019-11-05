@@ -98,29 +98,36 @@ public class DefaultGuiProviders {
 
         //noinspection unchecked
         registry.registerPredicateProvider(
-            (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
-                ENTRY_BUILDER.startDropdownMenu(
-                    i13n,
-                    DropdownMenuBuilder.TopCellElementBuilder.of(
-                        getUnsafely(field, config),
-                        str -> {
-                            for (Object constant : field.getType().getEnumConstants()) {
-                                if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
-                                    return constant;
+            (i13n, field, config, defaults, guiProvider) -> {
+                List<Enum> enums = new ArrayList<>();
+                for (Object constant : field.getType().getEnumConstants()) {
+                    enums.add((Enum) constant);
+                }
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startDropdownMenu(
+                        i13n,
+                        DropdownMenuBuilder.TopCellElementBuilder.of(
+                            getUnsafely(field, config, null),
+                            str -> {
+                                for (Object constant : field.getType().getEnumConstants()) {
+                                    if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
+                                        return (Enum) constant;
+                                    }
                                 }
-                            }
-                            return null;
-                        },
-                        e -> DEFAULT_NAME_PROVIDER.apply((Enum) e)
-                    ),
-                    DropdownMenuBuilder.CellCreatorBuilder.of(
-                        e -> DEFAULT_NAME_PROVIDER.apply((Enum) e)
+                                return null;
+                            },
+                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                        ),
+                        DropdownMenuBuilder.CellCreatorBuilder.of(
+                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                        )
                     )
-                )
-                    .setDefaultValue(() -> getUnsafely(field, defaults))
-                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
-                    .build()
-            ),
+                        .setSelections(enums)
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
             field -> field.getType().isEnum()
         );
 

@@ -3,8 +3,8 @@
 Annotation based API for mod configs, with Cloth Config GUI integration.
 For usage instructions, see the [wiki].
 
-# Naming of autoconfig1u
-The u stands for updated but I am too lazy to type the whole thing
+## Naming of autoconfig1u
+The u stands for updated because I am too lazy to type the whole thing
 
 ## Building from source
 
