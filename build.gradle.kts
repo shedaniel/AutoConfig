@@ -135,7 +135,7 @@ val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
 publishing {
     publications {
         afterEvaluate {
-            register("mavenJava", MavenPublication::class) {
+            register("mavenJava", MavenPublication::class.java) {
                 artifact(remapJar)
                 artifact(sourcesJar.get()) {
                     builtBy(sourcesJar)
