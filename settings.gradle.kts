@@ -7,4 +7,4 @@ pluginManagement {
     }
 }
 
-rootProject.name = "auto-config"
+rootProject.name = "autoconfig1u"

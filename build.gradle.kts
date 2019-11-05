@@ -1,10 +1,7 @@
 @file:Suppress("PropertyName")
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.matthewprenger.cursegradle.CurseProject
-import com.matthewprenger.cursegradle.CurseRelation
-import com.matthewprenger.cursegradle.Options
-import com.palantir.gradle.gitversion.VersionDetails
+import com.jfrog.bintray.gradle.BintrayExtension
 import net.fabricmc.loom.task.RemapJarTask
 import net.fabricmc.loom.task.RemapSourcesJarTask
 
@@ -12,6 +9,7 @@ val curseProjectId: String by project
 val basePackage: String by project
 val modJarBaseName: String by project
 val modMavenGroup: String by project
+val modVersion: String by project
 
 val minecraft_version: String by project
 val yarn_mappings: String by project
@@ -22,10 +20,12 @@ plugins {
     java
     idea
     `maven-publish`
+    signing
+    id("com.jfrog.bintray") version "1.8.4"
     id("fabric-loom") version "0.2.5-SNAPSHOT"
     id("com.palantir.git-version") version "0.11.0"
     id("com.github.johnrengelman.shadow") version "5.0.0"
-    id("com.matthewprenger.cursegradle") version "1.2.0"
+//    id("com.matthewprenger.cursegradle") version "1.2.0"
 }
 
 java {
@@ -39,26 +39,22 @@ base {
 
 repositories {
     maven(url = "http://maven.fabricmc.net/")
-    maven(url = "https://minecraft.curseforge.com/api/maven")
     jcenter()
 }
 
-val gitVersion: groovy.lang.Closure<Any> by extra
-val versionDetails: groovy.lang.Closure<VersionDetails> by extra
-
-version = "${gitVersion()}+mc$minecraft_version"
+version = modVersion
 group = modMavenGroup
 
 minecraft {
 }
 
-configurations {
-    listOf(shadow, implementation, mappings, modCompile, include).forEach {
-        it {
-            resolutionStrategy.activateDependencyLocking()
-        }
-    }
-}
+//configurations {
+//    listOf(shadow, implementation, mappings, modCompile, include).forEach {
+//        it {
+//            resolutionStrategy.activateDependencyLocking()
+//        }
+//    }
+//}
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
@@ -66,7 +62,7 @@ dependencies {
     modCompile("net.fabricmc:fabric-loader:$loader_version")
     modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modCompile("me.shedaniel.cloth:config-2:1.1.1")
+    modCompile("me.shedaniel.cloth:config-2:1.8")
     modCompile("io.github.prospector:modmenu:1.7+")
 
     shadow("blue.endless:jankson:1.1.+")
@@ -107,67 +103,49 @@ val jar = tasks.getByName<Jar>("jar") {
     from("LICENSE")
 }
 
-val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
-    (this as AbstractArchiveTask).dependsOn(shadowJar)
-    this.input.set(shadowJar.archiveFile)
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    setPublications("mavenJava")
+    override = true
+    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+        repo = "autoconfig1u"
+        name = "autoconfig1u"
+        userOrg = "shedaniel"
+        setLicenses("Apache-2.0")
+        version.apply {
+            name = modVersion
+            vcsTag = modVersion
+            githubRepo = "shedaniel/AutoConfig"
+            websiteUrl = "https://github.com/shedaniel/AutoConfig"
+            issueTrackerUrl = "https://github.com/shedaniel/AutoConfig/issues"
+            vcsUrl = "https://github.com/shedaniel/AutoConfig.git"
+            gpg.sign = true
+        }
+    })
 }
+
+val remapJar = tasks.getByName<RemapJarTask>("remapJar")
+//val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
+//    dependsOn(shadowJar)
+//    input.set(shadowJar.archiveFile)
+//}
 
 val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
 
-if (versionDetails().isCleanTag) {
-
-    publishing {
-
-        publications {
-            afterEvaluate {
-                register("mavenJava", MavenPublication::class) {
-                    artifact(remapJar)
-                    artifact(sourcesJar.get()) {
-                        builtBy(sourcesJar)
-                    }
+publishing {
+    publications {
+        afterEvaluate {
+            register("mavenJava", MavenPublication::class) {
+                artifact(remapJar)
+                artifact(sourcesJar.get()) {
+                    builtBy(sourcesJar)
                 }
-            }
-        }
-
-        repositories {
-            if (project.hasProperty("publish_maven_s3_url")) {
-                maven {
-                    setUrl(project.property("publish_maven_s3_url")!!)
-                    credentials(AwsCredentials::class) {
-                        accessKey = project.property("publish_maven_s3_access_key") as String
-                        secretKey = project.property("publish_maven_s3_secret_key") as String
-                    }
-                }
-            } else {
-                mavenLocal()
             }
         }
     }
 
-    curseforge {
-        if (project.hasProperty("curseforge_api_key")) {
-            apiKey = project.property("curseforge_api_key")!!
-        }
-
-        project(closureOf<CurseProject> {
-            id = curseProjectId
-            changelog = file("changelog.txt")
-            releaseType = "release"
-            addGameVersion(minecraft_version)
-            relations(closureOf<CurseRelation> {
-                requiredDependency("fabric-api")
-                requiredDependency("cloth-config")
-            })
-            mainArtifact(remapJar)
-            afterEvaluate {
-                uploadTask.dependsOn(remapJar)
-            }
-
-        })
-
-        options(closureOf<Options> {
-            forgeGradleIntegration = false
-        })
+    repositories {
     }
-
 }
+

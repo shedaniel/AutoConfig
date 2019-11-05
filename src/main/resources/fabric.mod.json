@@ -1,38 +1,38 @@
 {
     "$schema": "https://gist.githubusercontent.com/MrYurihi/4460e90099cf934b2078c7607bb0562b/raw/3713076d9d16ad66ba00aad3fa525872ab3438af/mod.json",
     "schemaVersion": 1,
-    "id": "autoconfig1",
+    "id": "autoconfig1u",
     "version": "%VERSION%",
-    "name": "Auto Config v1",
+    "name": "Auto Config v1 Updated",
     "description": "Annotation based API for mod configs, with Cloth Config GUI integration",
     "authors": [
         "sargunv"
     ],
     "contact": {
         "homepage": "https://gitlab.com/sargunv-mc-mods/auto-config/wikis/home",
-        "sources": "https://gitlab.com/sargunv-mc-mods/auto-config",
-        "issues": "https://gitlab.com/sargunv-mc-mods/auto-config/issues"
+        "sources": "https://github.com/shedaniel/AutoConfig",
+        "issues": "https://github.com/shedaniel/AutoConfig/issues"
     },
     "license": "Apache-2.0",
-    "icon": "assets/autoconfig1/icon.png",
+    "icon": "assets/autoconfig1u/icon.png",
     "environment": "*",
     "entrypoints": {
         "main": [
-            "me.sargunvohra.mcmods.autoconfig1.example.ExampleInit"
+            "me.sargunvohra.mcmods.autoconfig1u.example.ExampleInit"
         ],
         "client": [
-            "me.sargunvohra.mcmods.autoconfig1.example.ExampleInit"
+            "me.sargunvohra.mcmods.autoconfig1u.example.ExampleInitClient"
         ],
         "modmenu": [
-            "me.sargunvohra.mcmods.autoconfig1.example.ExampleModMenuCompat"
+            "me.sargunvohra.mcmods.autoconfig1u.example.ExampleModMenuCompat"
         ]
     },
     "mixins": [],
     "depends": {
         "fabricloader": ">=0.4.0",
-        "fabric-api-base": ">=0.1.0",
-        "fabric-api-resource-loader-v0": ">=0.1.0",
-        "clothconfig": ">=0.2.0"
+        "fabric-api-base": "*",
+        "fabric-resource-loader-v0": "*",
+        "cloth-config2": ">=1.8"
     },
     "custom": {
         "modmenu:api": true
