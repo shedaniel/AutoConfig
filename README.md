@@ -1,5 +1,7 @@
 # Auto Config API
 
+This is a fork of Auto Config API.
+
 Annotation based API for mod configs, with Cloth Config GUI integration.
 For usage instructions, see the [wiki].
 
