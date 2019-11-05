@@ -125,11 +125,10 @@ bintray {
     })
 }
 
-val remapJar = tasks.getByName<RemapJarTask>("remapJar")
-//val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
-//    dependsOn(shadowJar)
-//    input.set(shadowJar.archiveFile)
-//}
+val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
+    (this as AbstractArchiveTask).dependsOn(shadowJar)
+    (this.input as FileSystemLocationProperty<*>).set(shadowJar.archivePath)
+}
 
 val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
 
