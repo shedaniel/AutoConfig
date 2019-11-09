@@ -125,6 +125,7 @@ bintray {
     })
 }
 
+@Suppress("CAST_NEVER_SUCCEEDS")
 val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
     (this as AbstractArchiveTask).dependsOn(shadowJar)
     (this.input as FileSystemLocationProperty<*>).set(shadowJar.archivePath)
