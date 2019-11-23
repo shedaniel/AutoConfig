@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.*;
@@ -26,6 +27,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
     private final ConfigManager<T> manager;
     private final GuiRegistryAccess registry;
     private final Screen parent;
+    private Function<ConfigManager<T>, String> i13nFunction = manager -> String.format("text.autoconfig.%s", manager.getDefinition().name());
 
     public ConfigScreenProvider(
         ConfigManager<T> manager,
@@ -37,13 +39,17 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         this.parent = parent;
     }
 
+    @Deprecated
+    public void setI13nFunction(Function<ConfigManager<T>, String> i13nFunction) {
+        this.i13nFunction = i13nFunction;
+    }
 
     @Override
     public Screen get() {
         T config = manager.getConfig();
         T defaults = manager.getSerializer().createDefault();
 
-        String i13n = String.format("text.autoconfig.%s", manager.getDefinition().name());
+        String i13n = i13nFunction.apply(manager);
 
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(String.format("%s.title", i13n)).setSavingRunnable(manager::save);
 

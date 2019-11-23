@@ -139,6 +139,13 @@ public class DefaultGuiProviders {
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))
                     .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                    .setYesNoTextSupplier(bool -> {
+                        String key = i13n + ".boolean." + bool;
+                        String translate = I18n.translate(key);
+                        if (translate.equals(key))
+                            return I18n.translate("text.cloth-config.boolean.value." + bool);
+                        return translate;
+                    })
                     .build()
             ),
             boolean.class, Boolean.class
