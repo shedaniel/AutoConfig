@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -28,6 +29,8 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
     private final GuiRegistryAccess registry;
     private final Screen parent;
     private Function<ConfigManager<T>, String> i13nFunction = manager -> String.format("text.autoconfig.%s", manager.getDefinition().name());
+    private BiFunction<String, Field, String> optionFunction = (baseI13n, field) -> String.format("%s.option.%s", baseI13n, field.getName());
+    private BiFunction<String, String, String> categoryFunction = (baseI13n, categoryName) -> String.format("%s.category.%s", baseI13n, categoryName);
 
     public ConfigScreenProvider(
         ConfigManager<T> manager,
@@ -42,6 +45,16 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
     @Deprecated
     public void setI13nFunction(Function<ConfigManager<T>, String> i13nFunction) {
         this.i13nFunction = i13nFunction;
+    }
+
+    @Deprecated
+    public void setCategoryFunction(BiFunction<String, String, String> categoryFunction) {
+        this.categoryFunction = categoryFunction;
+    }
+
+    @Deprecated
+    public void setOptionFunction(BiFunction<String, Field, String> optionFunction) {
+        this.optionFunction = optionFunction;
     }
 
     @Override
@@ -81,7 +94,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
             .forEach(
                 (key, value) -> value.forEach(
                     field -> {
-                        String optionI13n = String.format("%s.option.%s", i13n, field.getName());
+                        String optionI13n = optionFunction.apply(i13n, field);
                         registry.getAndTransform(optionI13n, field, config, defaults, registry)
                             .forEach(key::addEntry);
                     }
@@ -102,7 +115,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         if (field.isAnnotationPresent(ConfigEntry.Category.class))
             categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
 
-        String categoryKey = String.format("%s.category.%s", baseI13n, categoryName);
+        String categoryKey = categoryFunction.apply(baseI13n, categoryName);
 
         if (!screenBuilder.hasCategory(categoryKey)) {
             ConfigCategory category = screenBuilder.getOrCreateCategory(categoryKey);
