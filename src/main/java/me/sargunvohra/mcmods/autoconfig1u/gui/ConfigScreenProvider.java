@@ -29,6 +29,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
     private final GuiRegistryAccess registry;
     private final Screen parent;
     private Function<ConfigManager<T>, String> i13nFunction = manager -> String.format("text.autoconfig.%s", manager.getDefinition().name());
+    private Function<ConfigBuilder, Screen> buildFunction = ConfigBuilder::build;
     private BiFunction<String, Field, String> optionFunction = (baseI13n, field) -> String.format("%s.option.%s", baseI13n, field.getName());
     private BiFunction<String, String, String> categoryFunction = (baseI13n, categoryName) -> String.format("%s.category.%s", baseI13n, categoryName);
 
@@ -45,6 +46,11 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
     @Deprecated
     public void setI13nFunction(Function<ConfigManager<T>, String> i13nFunction) {
         this.i13nFunction = i13nFunction;
+    }
+
+    @Deprecated
+    public void setBuildFunction(Function<ConfigBuilder, Screen> buildFunction) {
+        this.buildFunction = buildFunction;
     }
 
     @Deprecated
@@ -101,7 +107,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
                 )
             );
 
-        return builder.build();
+        return buildFunction.apply(builder);
     }
 
     private ConfigCategory getOrCreateCategoryForField(
