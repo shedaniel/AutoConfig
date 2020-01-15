@@ -29,108 +29,16 @@ public class DefaultGuiProviders {
     }
 
     public static GuiRegistry apply(GuiRegistry registry) {
+        registerAnnotationProviders(registry);
 
-        registry.registerAnnotationProvider(
-            (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
-            ConfigEntry.Gui.Excluded.class
-        );
+        registerPredicateProviders(registry);
 
-        registry.registerAnnotationProvider(
-            (i13n, field, config, defaults, guiProvider) -> {
-                ConfigEntry.BoundedDiscrete bounds
-                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+        registerTypeProviders(registry);
 
-                return Collections.singletonList(
-                    ENTRY_BUILDER.startIntSlider(
-                        i13n,
-                        getUnsafely(field, config, 0),
-                        (int) bounds.min(),
-                        (int) bounds.max()
-                    )
-                        .setDefaultValue(() -> getUnsafely(field, defaults))
-                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
-                        .build()
-                );
-            },
-            field -> field.getType() == int.class || field.getType() == Integer.class,
-            ConfigEntry.BoundedDiscrete.class
-        );
+        return registry;
+    }
 
-        registry.registerAnnotationProvider(
-            (i13n, field, config, defaults, guiProvider) -> {
-                ConfigEntry.BoundedDiscrete bounds
-                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
-
-                return Collections.singletonList(
-                    ENTRY_BUILDER.startLongSlider(
-                        i13n,
-                        getUnsafely(field, config, 0L),
-                        bounds.min(),
-                        bounds.max()
-                    )
-                        .setDefaultValue(() -> getUnsafely(field, defaults))
-                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
-                        .build()
-                );
-            },
-            field -> field.getType() == long.class || field.getType() == Long.class,
-            ConfigEntry.BoundedDiscrete.class
-        );
-
-        registry.registerAnnotationProvider(
-            DefaultGuiProviders::getChildren,
-            field -> !field.getType().isPrimitive(),
-            ConfigEntry.Gui.TransitiveObject.class
-        );
-
-        registry.registerAnnotationProvider(
-            (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
-                ENTRY_BUILDER.startSubCategory(
-                    i13n,
-                    getChildren(i13n, field, config, defaults, guiProvider)
-                )
-                    .setExpended(field.getAnnotation(ConfigEntry.Gui.CollapsibleObject.class).startExpanded())
-                    .build()
-            ),
-            field -> !field.getType().isPrimitive(),
-            ConfigEntry.Gui.CollapsibleObject.class
-        );
-
-        //noinspection unchecked
-        registry.registerPredicateProvider(
-            (i13n, field, config, defaults, guiProvider) -> {
-                List<Enum> enums = new ArrayList<>();
-                for (Object constant : field.getType().getEnumConstants()) {
-                    enums.add((Enum) constant);
-                }
-                return Collections.singletonList(
-                    ENTRY_BUILDER.startDropdownMenu(
-                        i13n,
-                        DropdownMenuBuilder.TopCellElementBuilder.of(
-                            getUnsafely(field, config, null),
-                            str -> {
-                                for (Object constant : field.getType().getEnumConstants()) {
-                                    if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
-                                        return (Enum) constant;
-                                    }
-                                }
-                                return null;
-                            },
-                            e -> DEFAULT_NAME_PROVIDER.apply(e)
-                        ),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(
-                            e -> DEFAULT_NAME_PROVIDER.apply(e)
-                        )
-                    )
-                        .setSelections(enums)
-                        .setDefaultValue(() -> getUnsafely(field, defaults))
-                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
-                        .build()
-                );
-            },
-            field -> field.getType().isEnum()
-        );
-
+    private static void registerTypeProviders(GuiRegistry registry) {
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startBooleanToggle(
@@ -215,8 +123,111 @@ public class DefaultGuiProviders {
             ),
             String.class
         );
+    }
 
-        return registry;
+    private static void registerPredicateProviders(GuiRegistry registry) {
+        registry.registerPredicateProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                List<Enum> enums = new ArrayList<>();
+                for (Object constant : field.getType().getEnumConstants()) {
+                    enums.add((Enum) constant);
+                }
+                //noinspection unchecked
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startDropdownMenu(
+                        i13n,
+                        DropdownMenuBuilder.TopCellElementBuilder.of(
+                            getUnsafely(field, config, null),
+                            str -> {
+                                for (Object constant : field.getType().getEnumConstants()) {
+                                    if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
+                                        return (Enum) constant;
+                                    }
+                                }
+                                return null;
+                            },
+                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                        ),
+                        DropdownMenuBuilder.CellCreatorBuilder.of(
+                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                        )
+                    )
+                        .setSelections(enums)
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            field -> field.getType().isEnum()
+        );
+    }
+
+    private static void registerAnnotationProviders(GuiRegistry registry) {
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
+            ConfigEntry.Gui.Excluded.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startIntSlider(
+                        i13n,
+                        getUnsafely(field, config, 0),
+                        (int) bounds.min(),
+                        (int) bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            field -> field.getType() == int.class || field.getType() == Integer.class,
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.BoundedDiscrete bounds
+                    = field.getAnnotation(ConfigEntry.BoundedDiscrete.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startLongSlider(
+                        i13n,
+                        getUnsafely(field, config, 0L),
+                        bounds.min(),
+                        bounds.max()
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            field -> field.getType() == long.class || field.getType() == Long.class,
+            ConfigEntry.BoundedDiscrete.class
+        );
+
+        registry.registerAnnotationProvider(
+            DefaultGuiProviders::getChildren,
+            field -> !field.getType().isPrimitive(),
+            ConfigEntry.Gui.TransitiveObject.class
+        );
+
+        registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
+                ENTRY_BUILDER.startSubCategory(
+                    i13n,
+                    getChildren(i13n, field, config, defaults, guiProvider)
+                )
+                    .setExpended(field.getAnnotation(ConfigEntry.Gui.CollapsibleObject.class).startExpanded())
+                    .build()
+            ),
+            field -> !field.getType().isPrimitive(),
+            ConfigEntry.Gui.CollapsibleObject.class
+        );
     }
 
     private static List<AbstractConfigListEntry> getChildren(String i13n, Field field, Object config, Object defaults, GuiRegistryAccess guiProvider) {
