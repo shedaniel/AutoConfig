@@ -22,9 +22,9 @@ plugins {
     `maven-publish`
     signing
     id("com.jfrog.bintray") version "1.8.4"
-    id("fabric-loom") version "0.2.5-SNAPSHOT"
+    id("fabric-loom") version "0.2.6-SNAPSHOT"
     id("com.palantir.git-version") version "0.11.0"
-    id("com.github.johnrengelman.shadow") version "5.0.0"
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 //    id("com.matthewprenger.cursegradle") version "1.2.0"
 }
 
@@ -38,7 +38,7 @@ base {
 }
 
 repositories {
-    maven(url = "http://maven.fabricmc.net/")
+    maven(url = "https://maven.fabricmc.net/")
     jcenter()
 }
 
@@ -48,22 +48,14 @@ group = modMavenGroup
 minecraft {
 }
 
-//configurations {
-//    listOf(shadow, implementation, mappings, modCompile, include).forEach {
-//        it {
-//            resolutionStrategy.activateDependencyLocking()
-//        }
-//    }
-//}
-
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
     mappings("net.fabricmc:yarn:$yarn_mappings")
-    modCompile("net.fabricmc:fabric-loader:$loader_version")
-    modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version")
+    modImplementation("net.fabricmc:fabric-loader:$loader_version")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modCompile("me.shedaniel.cloth:config-2:1.8")
-    modCompile("io.github.prospector:modmenu:1.7+")
+    modImplementation("me.shedaniel.cloth:config-2:2.6.6")
+    modImplementation("io.github.prospector:modmenu:1.8.4+build.20")
 
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")
@@ -91,17 +83,24 @@ val sourcesJar by tasks.registering(Jar::class) {
     from(sourceSets.main.get().allSource)
 }
 
-val shadowJar = tasks.getByName<ShadowJar>("shadowJar").apply {
+val jar = tasks.getByName<Jar>("jar") {
+    from("LICENSE")
+}
+
+val shadowJar = tasks.getByName<ShadowJar>("shadowJar") {
     relocate("blue.endless.jankson", "$basePackage.shadowed.blue.endless.jankson")
     relocate("com.moandjiezana.toml", "$basePackage.shadowed.com.moandjiezana.toml")
 
     configurations = listOf(project.configurations["shadow"])
-    archiveClassifier.set("shadow")
 }
 
-val jar = tasks.getByName<Jar>("jar") {
-    from("LICENSE")
+@Suppress("CAST_NEVER_SUCCEEDS", "UnstableApiUsage")
+val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
+    this.dependsOn(shadowJar)
+    (this.input as RegularFileProperty).set(shadowJar.archiveFile)
 }
+
+val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
 
 bintray {
     user = System.getenv("BINTRAY_USER")
@@ -124,14 +123,6 @@ bintray {
         }
     })
 }
-
-@Suppress("CAST_NEVER_SUCCEEDS")
-val remapJar = tasks.getByName<RemapJarTask>("remapJar") {
-    (this as AbstractArchiveTask).dependsOn(shadowJar)
-    (this.input as FileSystemLocationProperty<*>).set(shadowJar.archivePath)
-}
-
-val remapSourcesJar = tasks.getByName<RemapSourcesJarTask>("remapSourcesJar")
 
 publishing {
     publications {
