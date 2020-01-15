@@ -45,6 +45,8 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
         private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
+
+        private final List<Integer> list = Arrays.asList(1, 2, 3);
     }
 
     @Config(name = "module_b")

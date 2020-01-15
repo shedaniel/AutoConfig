@@ -9,6 +9,7 @@
     "text.autoconfig.autoconfig1u_example.option.moduleA.anEnum.@Tooltip[1]": "This entry is auto generated from an enum field",
     "text.autoconfig.autoconfig1u_example.option.moduleA.aString": "A String",
     "text.autoconfig.autoconfig1u_example.option.moduleA.anObject": "An Object",
+    "text.autoconfig.autoconfig1u_example.option.moduleA.list": "A List<Integer>",
     "text.autoconfig.autoconfig1u_example.option.moduleA.anObject.first": "First",
     "text.autoconfig.autoconfig1u_example.option.moduleA.anObject.second": "Second",
     "text.autoconfig.autoconfig1u_example.option.moduleA.anObject.first.foo": "foo",

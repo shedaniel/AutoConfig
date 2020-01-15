@@ -12,8 +12,11 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.getUnsafely;
@@ -160,6 +163,13 @@ public class DefaultGuiProviders {
             },
             field -> field.getType().isEnum()
         );
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startIntList(i13n, getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(Integer.class));
     }
 
     private static void registerAnnotationProviders(GuiRegistry registry) {
@@ -244,5 +254,16 @@ public class DefaultGuiProviders {
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
+    }
+
+    private static Predicate<Field> isListOfType(Type type) {
+        return field -> {
+            if (List.class.isAssignableFrom(field.getType()) && field.getGenericType() instanceof ParameterizedType) {
+                Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+                return args.length == 1 && Objects.equals(args[0], type);
+            } else {
+                return false;
+            }
+        };
     }
 }
