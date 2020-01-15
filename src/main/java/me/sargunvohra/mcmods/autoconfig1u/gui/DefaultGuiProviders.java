@@ -23,12 +23,13 @@ import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
 public class DefaultGuiProviders {
 
     private static final ConfigEntryBuilder ENTRY_BUILDER = ConfigEntryBuilder.create();
-    private static final Function<Enum, String> DEFAULT_NAME_PROVIDER = t -> I18n.translate(t instanceof SelectionListEntry.Translatable ? ((SelectionListEntry.Translatable) t).getKey() : t.toString());
+    private static final Function<Enum<?>, String> DEFAULT_NAME_PROVIDER = t -> I18n.translate(t instanceof SelectionListEntry.Translatable ? ((SelectionListEntry.Translatable) t).getKey() : t.name());
 
     private DefaultGuiProviders() {
     }
 
     public static GuiRegistry apply(GuiRegistry registry) {
+
         registerAnnotationProviders(registry);
 
         registerPredicateProviders(registry);
@@ -128,28 +129,27 @@ public class DefaultGuiProviders {
     private static void registerPredicateProviders(GuiRegistry registry) {
         registry.registerPredicateProvider(
             (i13n, field, config, defaults, guiProvider) -> {
-                List<Enum> enums = new ArrayList<>();
-                for (Object constant : field.getType().getEnumConstants()) {
-                    enums.add((Enum) constant);
-                }
+                @SuppressWarnings("unchecked")
+                List<Enum<?>> enums = Arrays.asList(((Class<? extends Enum<?>>) field.getType()).getEnumConstants());
+
                 //noinspection unchecked
                 return Collections.singletonList(
-                    ENTRY_BUILDER.startDropdownMenu(
+                    ENTRY_BUILDER.<Enum<?>>startDropdownMenu(
                         i13n,
                         DropdownMenuBuilder.TopCellElementBuilder.of(
                             getUnsafely(field, config, null),
                             str -> {
-                                for (Object constant : field.getType().getEnumConstants()) {
-                                    if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
-                                        return (Enum) constant;
+                                for (Enum<?> constant : enums) {
+                                    if (DEFAULT_NAME_PROVIDER.apply(constant).equals(str)) {
+                                        return constant;
                                     }
                                 }
                                 return null;
                             },
-                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                            DEFAULT_NAME_PROVIDER
                         ),
                         DropdownMenuBuilder.CellCreatorBuilder.of(
-                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                            DEFAULT_NAME_PROVIDER
                         )
                     )
                         .setSelections(enums)
