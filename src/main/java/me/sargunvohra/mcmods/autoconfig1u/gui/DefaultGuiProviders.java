@@ -137,10 +137,10 @@ public class DefaultGuiProviders {
 
                 //noinspection unchecked
                 return Collections.singletonList(
-                    ENTRY_BUILDER.<Enum<?>>startDropdownMenu(
+                    ENTRY_BUILDER.startDropdownMenu(
                         i13n,
                         DropdownMenuBuilder.TopCellElementBuilder.of(
-                            getUnsafely(field, config, null),
+                            getUnsafely(field, config),
                             str -> {
                                 for (Enum<?> constant : enums) {
                                     if (DEFAULT_NAME_PROVIDER.apply(constant).equals(str)) {
