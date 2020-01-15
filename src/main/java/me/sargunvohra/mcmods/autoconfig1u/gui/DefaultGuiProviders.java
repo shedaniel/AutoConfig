@@ -284,6 +284,12 @@ public class DefaultGuiProviders {
             .collect(Collectors.toList());
     }
 
+    /**
+     * Returns a predicate that tests if the field is a list containing some particular {@link Type}, i.e. {@code List<Integer>}.
+     *
+     * @param type the type to check for in the list's parameter
+     * @return {@code true} if the field is a list containing the provided type, {@code false} otherwise
+     */
     private static Predicate<Field> isListOfType(Type type) {
         return field -> {
             if (List.class.isAssignableFrom(field.getType()) && field.getGenericType() instanceof ParameterizedType) {
