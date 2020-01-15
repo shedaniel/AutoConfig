@@ -177,6 +177,13 @@ public class DefaultGuiProviders {
                 .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
                 .build()
         ), isListOfType(Long.class));
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startFloatList(i13n, getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(Float.class));
     }
 
     private static void registerAnnotationProviders(GuiRegistry registry) {
