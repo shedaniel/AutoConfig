@@ -4,9 +4,9 @@ import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.gui.ConfigScreenProvider;
 import me.sargunvohra.mcmods.autoconfig1u.gui.DefaultGuiProviders;
 import me.sargunvohra.mcmods.autoconfig1u.gui.DefaultGuiTransformers;
+import me.sargunvohra.mcmods.autoconfig1u.gui.registry.ComposedGuiRegistryAccess;
 import me.sargunvohra.mcmods.autoconfig1u.gui.registry.DefaultGuiRegistryAccess;
 import me.sargunvohra.mcmods.autoconfig1u.gui.registry.GuiRegistry;
-import me.sargunvohra.mcmods.autoconfig1u.gui.registry.ComposedGuiRegistryAccess;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.ConfigSerializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -65,8 +65,7 @@ public class AutoConfig {
 
     @Environment(EnvType.CLIENT)
     public static <T extends ConfigData> Supplier<Screen> getConfigScreen(Class<T> configClass, Screen parent) {
-        //noinspection unchecked
-        return new <T>ConfigScreenProvider(
+        return new ConfigScreenProvider<>(
             (ConfigManager<T>) AutoConfig.getConfigHolder(configClass),
             new ComposedGuiRegistryAccess(
                 getGuiRegistry(configClass),

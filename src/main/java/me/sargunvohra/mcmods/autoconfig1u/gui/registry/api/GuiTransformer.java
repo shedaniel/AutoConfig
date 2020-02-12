@@ -10,8 +10,8 @@ import java.util.List;
 @FunctionalInterface
 @Environment(EnvType.CLIENT)
 public interface GuiTransformer {
-    List<AbstractConfigListEntry> transform(
-        List<AbstractConfigListEntry> guis,
+    List<AbstractConfigListEntry<?>> transform(
+        List<AbstractConfigListEntry<?>> guis,
         String i13n,
         Field field,
         Object config,

@@ -20,7 +20,7 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     }
 
     @Override
-    public List<AbstractConfigListEntry> get(
+    public List<AbstractConfigListEntry<?>> get(
         String i13n,
         Field field,
         Object config,
@@ -34,8 +34,8 @@ public class ComposedGuiRegistryAccess implements GuiRegistryAccess {
     }
 
     @Override
-    public List<AbstractConfigListEntry> transform(
-        List<AbstractConfigListEntry> guis,
+    public List<AbstractConfigListEntry<?>> transform(
+        List<AbstractConfigListEntry<?>> guis,
         String i13n,
         Field field,
         Object config,

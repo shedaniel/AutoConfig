@@ -9,7 +9,7 @@ import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public interface GuiRegistryAccess extends GuiProvider, GuiTransformer {
-    default List<AbstractConfigListEntry> getAndTransform(
+    default List<AbstractConfigListEntry<?>> getAndTransform(
         String i13n,
         Field field,
         Object config,

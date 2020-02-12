@@ -54,8 +54,8 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$loader_version")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabric_version")
 
-    modImplementation("me.shedaniel.cloth:config-2:2.6.6")
-    modImplementation("io.github.prospector:modmenu:1.8.4+build.20")
+    modImplementation("me.shedaniel.cloth:config-2:2.9.3")
+    modImplementation("io.github.prospector:modmenu:1.9.0+build.27")
 
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")

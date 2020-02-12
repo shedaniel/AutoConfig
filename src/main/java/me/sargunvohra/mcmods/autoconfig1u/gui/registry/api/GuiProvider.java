@@ -10,7 +10,7 @@ import java.util.List;
 @FunctionalInterface
 @Environment(EnvType.CLIENT)
 public interface GuiProvider {
-    List<AbstractConfigListEntry> get(
+    List<AbstractConfigListEntry<?>> get(
         String i13n,
         Field field,
         Object config,

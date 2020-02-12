@@ -36,7 +36,7 @@ public final class GuiRegistry implements GuiRegistryAccess {
     }
 
     @Override
-    public List<AbstractConfigListEntry> get(
+    public List<AbstractConfigListEntry<?>> get(
         String i13n,
         Field field,
         Object config,
@@ -57,8 +57,8 @@ public final class GuiRegistry implements GuiRegistryAccess {
     }
 
     @Override
-    public List<AbstractConfigListEntry> transform(
-        List<AbstractConfigListEntry> guis,
+    public List<AbstractConfigListEntry<?>> transform(
+        List<AbstractConfigListEntry<?>> guis,
         String i13n,
         Field field,
         Object config,
@@ -81,8 +81,8 @@ public final class GuiRegistry implements GuiRegistryAccess {
         providers.computeIfAbsent(priority, p -> new ArrayList<>()).add(new ProviderEntry(predicate, provider));
     }
 
-    public final void registerTypeProvider(GuiProvider provider, Class... types) {
-        for (Class type : types) {
+    public final void registerTypeProvider(GuiProvider provider, Class<?>... types) {
+        for (Class<?> type : types) {
             registerProvider(Priority.LAST, provider, field -> type == field.getType());
         }
     }

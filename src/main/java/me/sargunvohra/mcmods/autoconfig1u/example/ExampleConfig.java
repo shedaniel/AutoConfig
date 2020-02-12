@@ -47,6 +47,8 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
         private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
 
         private final List<Integer> list = Arrays.asList(1, 2, 3);
+
+        private final List<PairOfInts> complexList = Arrays.asList(new PairOfInts(0, 1), new PairOfInts(3, 7));
     }
 
     @Config(name = "module_b")

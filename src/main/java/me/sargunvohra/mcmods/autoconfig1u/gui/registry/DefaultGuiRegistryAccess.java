@@ -10,7 +10,7 @@ import java.util.List;
 
 public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
     @Override
-    public List<AbstractConfigListEntry> get(
+    public List<AbstractConfigListEntry<?>> get(
         String i13n,
         Field field,
         Object config,
@@ -22,8 +22,8 @@ public class DefaultGuiRegistryAccess implements GuiRegistryAccess {
     }
 
     @Override
-    public List<AbstractConfigListEntry> transform(
-        List<AbstractConfigListEntry> guis,
+    public List<AbstractConfigListEntry<?>> transform(
+        List<AbstractConfigListEntry<?>> guis,
         String i13n,
         Field field,
         Object config,

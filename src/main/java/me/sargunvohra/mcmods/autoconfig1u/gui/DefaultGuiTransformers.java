@@ -70,7 +70,7 @@ public class DefaultGuiTransformers {
 
         registry.registerAnnotationTransformer(
             (guis, i13n, field, config, defaults, guiProvider) -> {
-                ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
+                ArrayList<AbstractConfigListEntry<?>> ret = new ArrayList<>(guis);
                 String text = String.format("%s.%s", i13n, "@PrefixText");
                 ret.add(0, ENTRY_BUILDER.startTextDescription(Language.getInstance().translate(text)).build());
                 return Collections.unmodifiableList(ret);
@@ -81,9 +81,9 @@ public class DefaultGuiTransformers {
         return registry;
     }
 
-    private static void tryApplyTooltip(AbstractConfigListEntry gui, String[] text) {
+    private static void tryApplyTooltip(AbstractConfigListEntry<?> gui, String[] text) {
         if (gui instanceof TooltipListEntry) {
-            TooltipListEntry tooltipGui = (TooltipListEntry) gui;
+            TooltipListEntry<?> tooltipGui = (TooltipListEntry<?>) gui;
             tooltipGui.setTooltipSupplier(() -> Optional.of(text));
         }
     }
