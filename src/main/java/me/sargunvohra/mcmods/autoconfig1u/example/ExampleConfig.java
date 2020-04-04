@@ -40,6 +40,10 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
         @ConfigEntry.Gui.Tooltip(count = 2)
         private ExampleEnum anEnum = ExampleEnum.FOO;
 
+        @ConfigEntry.Gui.Tooltip(count = 2)
+        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+        private ExampleEnum anEnumWithButton = ExampleEnum.FOO;
+
         @Comment("This tooltip was automatically applied from a Jankson @Comment")
         private String aString = "hello";
 

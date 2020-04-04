@@ -96,6 +96,27 @@ public class DefaultGuiProviders {
             ConfigEntry.Gui.CollapsibleObject.class
         );
 
+        registry.registerPredicateProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                Object[] enumConstants = field.getType().getEnumConstants();
+                Enum[] enums = new Enum[enumConstants.length];
+                for (int i = 0; i < enumConstants.length; i++) {
+                    enums[i] = (Enum) enumConstants[i];
+                }
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startSelector(
+                        i13n,
+                        enums,
+                        getUnsafely(field, config, null)
+                    )
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            field -> field.getType().isEnum() && field.isAnnotationPresent(ConfigEntry.Gui.EnumHandler.class) && field.getAnnotation(ConfigEntry.Gui.EnumHandler.class).option() == ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON
+        );
+
         //noinspection unchecked
         registry.registerPredicateProvider(
             (i13n, field, config, defaults, guiProvider) -> {
@@ -116,11 +137,9 @@ public class DefaultGuiProviders {
                                 }
                                 return null;
                             },
-                            e -> DEFAULT_NAME_PROVIDER.apply(e)
+                            DEFAULT_NAME_PROVIDER
                         ),
-                        DropdownMenuBuilder.CellCreatorBuilder.of(
-                            e -> DEFAULT_NAME_PROVIDER.apply(e)
-                        )
+                        DropdownMenuBuilder.CellCreatorBuilder.of(DEFAULT_NAME_PROVIDER)
                     )
                         .setSelections(enums)
                         .setDefaultValue(() -> getUnsafely(field, defaults))

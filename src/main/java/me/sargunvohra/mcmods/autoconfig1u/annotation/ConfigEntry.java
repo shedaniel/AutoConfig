@@ -91,5 +91,19 @@ public class ConfigEntry {
         @Target(ElementType.FIELD)
         public @interface PrefixText {
         }
+
+        /**
+         * Defines how an enum is handled
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface EnumHandler {
+            EnumDisplayOption option() default EnumDisplayOption.DROPDOWN;
+
+            enum EnumDisplayOption {
+                DROPDOWN,
+                BUTTON
+            }
+        }
     }
 }
