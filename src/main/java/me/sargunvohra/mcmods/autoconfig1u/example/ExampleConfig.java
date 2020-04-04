@@ -28,7 +28,9 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
     ModuleB moduleB = new ModuleB();
 
     enum ExampleEnum {
-        FOO, BAR, BAZ
+        FOO,
+        BAR,
+        BAZ
     }
 
     @Config(name = "module_a")
@@ -65,6 +67,9 @@ class ExampleConfig extends PartitioningSerializer.GlobalData {
 
         @ConfigEntry.Gui.Excluded
         private List<PairOfInts> aList = Arrays.asList(new PairOfInts(), new PairOfInts(3, 4));
+
+        @ConfigEntry.ColorPicker
+        private int color = 0xFFFFFF;
     }
 
     @Config(name = "empty")

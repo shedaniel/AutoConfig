@@ -32,6 +32,17 @@ public class ConfigEntry {
         long max();
     }
 
+    /**
+     * Applies to int fields.
+     * Sets the GUI to a color picker.
+     * In a future version it will enforce bounds at deserialization.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.FIELD)
+    public @interface ColorPicker {
+        boolean allowAlpha() default false;
+    }
+
 //    /**
 //     * Applies to float and double fields.
 //     * In a future version it will enforce bounds at deserialization.

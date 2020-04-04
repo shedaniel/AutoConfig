@@ -78,6 +78,26 @@ public class DefaultGuiProviders {
         );
 
         registry.registerAnnotationProvider(
+            (i13n, field, config, defaults, guiProvider) -> {
+                ConfigEntry.ColorPicker colorPicker
+                    = field.getAnnotation(ConfigEntry.ColorPicker.class);
+
+                return Collections.singletonList(
+                    ENTRY_BUILDER.startColorField(
+                        i13n,
+                        getUnsafely(field, config, 0)
+                    )
+                        .setAlphaMode(colorPicker.allowAlpha())
+                        .setDefaultValue(() -> getUnsafely(field, defaults))
+                        .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                        .build()
+                );
+            },
+            field -> field.getType() == int.class || field.getType() == Integer.class,
+            ConfigEntry.ColorPicker.class
+        );
+
+        registry.registerAnnotationProvider(
             DefaultGuiProviders::getChildren,
             field -> !field.getType().isPrimitive(),
             ConfigEntry.Gui.TransitiveObject.class
@@ -89,7 +109,7 @@ public class DefaultGuiProviders {
                     i13n,
                     getChildren(i13n, field, config, defaults, guiProvider)
                 )
-                    .setExpended(field.getAnnotation(ConfigEntry.Gui.CollapsibleObject.class).startExpanded())
+                    .setExpanded(field.getAnnotation(ConfigEntry.Gui.CollapsibleObject.class).startExpanded())
                     .build()
             ),
             field -> !field.getType().isPrimitive(),

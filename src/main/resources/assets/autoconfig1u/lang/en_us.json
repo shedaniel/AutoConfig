@@ -25,5 +25,6 @@
     "text.autoconfig.autoconfig1u_example.option.moduleB.anObject.first.foo": "foo",
     "text.autoconfig.autoconfig1u_example.option.moduleB.anObject.first.bar": "bar",
     "text.autoconfig.autoconfig1u_example.option.moduleB.anObject.second.foo": "foo",
-    "text.autoconfig.autoconfig1u_example.option.moduleB.anObject.second.bar": "bar"
+    "text.autoconfig.autoconfig1u_example.option.moduleB.anObject.second.bar": "bar",
+    "text.autoconfig.autoconfig1u_example.option.moduleB.color": "Color"
 }
