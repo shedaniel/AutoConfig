@@ -107,7 +107,7 @@ bintray {
     user = System.getenv("BINTRAY_USER")
     key = System.getenv("BINTRAY_KEY")
     setPublications("mavenJava")
-    override = true
+    publish = true
     pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
         repo = "autoconfig1u"
         name = "autoconfig1u"
