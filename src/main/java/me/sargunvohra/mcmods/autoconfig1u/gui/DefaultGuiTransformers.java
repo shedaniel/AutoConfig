@@ -9,8 +9,9 @@ import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Language;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,17 +37,16 @@ public class DefaultGuiTransformers {
                         if (tooltip.count() == 1) {
                             tryApplyTooltip(
                                 gui,
-                                new String[]{
-                                    Language.getInstance()
-                                        .translate(String.format("%s.%s", i13n, "@Tooltip"))
+                                new Text[]{
+                                    new TranslatableText(String.format("%s.%s", i13n, "@Tooltip"))
                                 }
                             );
                         } else {
                             tryApplyTooltip(
                                 gui, IntStream.range(0, tooltip.count()).boxed()
                                     .map(i -> String.format("%s.%s[%d]", i13n, "@Tooltip", i))
-                                    .map(Language.getInstance()::translate)
-                                    .toArray(String[]::new)
+                                    .map(TranslatableText::new)
+                                    .toArray(Text[]::new)
                             );
                         }
                     }
@@ -60,7 +60,7 @@ public class DefaultGuiTransformers {
                 .peek(gui -> {
                     if (!(gui instanceof TextListEntry)) {
                         Comment tooltip = field.getAnnotation(Comment.class);
-                        String[] text = new String[]{tooltip.value()};
+                        Text[] text = new Text[]{new LiteralText(tooltip.value())};
                         tryApplyTooltip(gui, text);
                     }
                 })
@@ -82,7 +82,7 @@ public class DefaultGuiTransformers {
         return registry;
     }
 
-    private static void tryApplyTooltip(AbstractConfigListEntry gui, String[] text) {
+    private static void tryApplyTooltip(AbstractConfigListEntry gui, Text[] text) {
         if (gui instanceof TooltipListEntry) {
             TooltipListEntry tooltipGui = (TooltipListEntry) gui;
             tooltipGui.setTooltipSupplier(() -> Optional.of(text));
