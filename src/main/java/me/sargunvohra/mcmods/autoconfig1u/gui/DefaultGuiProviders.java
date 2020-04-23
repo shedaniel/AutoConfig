@@ -1,5 +1,6 @@
 package me.sargunvohra.mcmods.autoconfig1u.gui;
 
+import com.google.common.collect.Lists;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1u.gui.registry.GuiRegistry;
 import me.sargunvohra.mcmods.autoconfig1u.gui.registry.api.GuiRegistryAccess;
@@ -10,6 +11,9 @@ import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -23,13 +27,12 @@ import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
 public class DefaultGuiProviders {
 
     private static final ConfigEntryBuilder ENTRY_BUILDER = ConfigEntryBuilder.create();
-    private static final Function<Enum, String> DEFAULT_NAME_PROVIDER = t -> I18n.translate(t instanceof SelectionListEntry.Translatable ? ((SelectionListEntry.Translatable) t).getKey() : t.toString());
+    private static final Function<Enum, Text> DEFAULT_NAME_PROVIDER = t -> new TranslatableText(t instanceof SelectionListEntry.Translatable ? ((SelectionListEntry.Translatable) t).getKey() : t.toString());
 
     private DefaultGuiProviders() {
     }
 
     public static GuiRegistry apply(GuiRegistry registry) {
-
         registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.emptyList(),
             ConfigEntry.Gui.Excluded.class
@@ -42,7 +45,7 @@ public class DefaultGuiProviders {
 
                 return Collections.singletonList(
                     ENTRY_BUILDER.startIntSlider(
-                        i13n,
+                        new TranslatableText(i13n),
                         getUnsafely(field, config, 0),
                         (int) bounds.min(),
                         (int) bounds.max()
@@ -63,7 +66,7 @@ public class DefaultGuiProviders {
 
                 return Collections.singletonList(
                     ENTRY_BUILDER.startLongSlider(
-                        i13n,
+                        new TranslatableText(i13n),
                         getUnsafely(field, config, 0L),
                         bounds.min(),
                         bounds.max()
@@ -84,7 +87,7 @@ public class DefaultGuiProviders {
 
                 return Collections.singletonList(
                     ENTRY_BUILDER.startColorField(
-                        i13n,
+                        new TranslatableText(i13n),
                         getUnsafely(field, config, 0)
                     )
                         .setAlphaMode(colorPicker.allowAlpha())
@@ -106,7 +109,7 @@ public class DefaultGuiProviders {
         registry.registerAnnotationProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startSubCategory(
-                    i13n,
+                    new TranslatableText(i13n),
                     getChildren(i13n, field, config, defaults, guiProvider)
                 )
                     .setExpanded(field.getAnnotation(ConfigEntry.Gui.CollapsibleObject.class).startExpanded())
@@ -125,7 +128,7 @@ public class DefaultGuiProviders {
                 }
                 return Collections.singletonList(
                     ENTRY_BUILDER.startSelector(
-                        i13n,
+                        new TranslatableText(i13n),
                         enums,
                         getUnsafely(field, config, null)
                     )
@@ -146,7 +149,7 @@ public class DefaultGuiProviders {
                 }
                 return Collections.singletonList(
                     ENTRY_BUILDER.startDropdownMenu(
-                        i13n,
+                        new TranslatableText(i13n),
                         DropdownMenuBuilder.TopCellElementBuilder.of(
                             getUnsafely(field, config, null),
                             str -> {
@@ -173,7 +176,7 @@ public class DefaultGuiProviders {
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startBooleanToggle(
-                    i13n,
+                    new TranslatableText(i13n),
                     getUnsafely(field, config, false)
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))
@@ -182,8 +185,8 @@ public class DefaultGuiProviders {
                         String key = i13n + ".boolean." + bool;
                         String translate = I18n.translate(key);
                         if (translate.equals(key))
-                            return I18n.translate("text.cloth-config.boolean.value." + bool);
-                        return translate;
+                            return new TranslatableText("text.cloth-config.boolean.value." + bool);
+                        return new LiteralText(translate);
                     })
                     .build()
             ),
@@ -193,7 +196,7 @@ public class DefaultGuiProviders {
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startIntField(
-                    i13n,
+                    new TranslatableText(i13n),
                     getUnsafely(field, config, 0)
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))
@@ -205,8 +208,21 @@ public class DefaultGuiProviders {
 
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
+                ENTRY_BUILDER.startIntList(
+                    new TranslatableText(i13n),
+                    Lists.newArrayList(getUnsafely(field, config, new Integer[0]))
+                )
+                    .setDefaultValue(() -> getUnsafely(field, defaults))
+                    .setSaveConsumer(newValue -> setUnsafely(field, config, newValue.toArray(new Integer[0])))
+                    .build()
+            ),
+            Integer[].class
+        );
+
+        registry.registerTypeProvider(
+            (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startLongField(
-                    i13n,
+                    new TranslatableText(i13n),
                     getUnsafely(field, config, 0L)
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))
@@ -219,7 +235,7 @@ public class DefaultGuiProviders {
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startFloatField(
-                    i13n,
+                    new TranslatableText(i13n),
                     getUnsafely(field, config, 0f)
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))
@@ -232,7 +248,7 @@ public class DefaultGuiProviders {
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startDoubleField(
-                    i13n,
+                    new TranslatableText(i13n),
                     getUnsafely(field, config, 0.0)
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))
@@ -245,7 +261,7 @@ public class DefaultGuiProviders {
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
                 ENTRY_BUILDER.startStrField(
-                    i13n,
+                    new TranslatableText(i13n),
                     getUnsafely(field, config, "")
                 )
                     .setDefaultValue(() -> getUnsafely(field, defaults))

@@ -60,10 +60,12 @@ dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
     mappings("net.fabricmc:yarn:$yarn_mappings")
     modCompile("net.fabricmc:fabric-loader:$loader_version")
-    modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version")
+    modCompile("net.fabricmc.fabric-api:fabric-api:$fabric_version") {
+        exclude(module = "fabric-biomes-v1")
+    }
 
-    modCompile("me.shedaniel.cloth:config-2:2.12")
-    modCompile("io.github.prospector:modmenu:1.10.2+build.32")
+    modCompile("me.shedaniel.cloth:config-2:4.0.0-unstable")
+    modCompileOnly("io.github.prospector:modmenu:1.10.2+build.32")
 
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")

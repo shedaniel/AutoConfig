@@ -9,6 +9,7 @@ import me.shedaniel.clothconfig2.gui.entries.TextListEntry;
 import me.shedaniel.clothconfig2.gui.entries.TooltipListEntry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Language;
 
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class DefaultGuiTransformers {
             (guis, i13n, field, config, defaults, guiProvider) -> {
                 ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
                 String text = String.format("%s.%s", i13n, "@PrefixText");
-                ret.add(0, ENTRY_BUILDER.startTextDescription(Language.getInstance().translate(text)).build());
+                ret.add(0, ENTRY_BUILDER.startTextDescription(new TranslatableText(text)).build());
                 return Collections.unmodifiableList(ret);
             },
             ConfigEntry.Gui.PrefixText.class

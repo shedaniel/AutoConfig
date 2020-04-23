@@ -10,6 +10,8 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 import java.lang.reflect.Field;
@@ -70,7 +72,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
 
         String i13n = i13nFunction.apply(manager);
 
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(String.format("%s.title", i13n)).setSavingRunnable(manager::save);
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableText(String.format("%s.title", i13n))).setSavingRunnable(manager::save);
 
         Class<T> configClass = manager.getConfigClass();
 
@@ -121,7 +123,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         if (field.isAnnotationPresent(ConfigEntry.Category.class))
             categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
 
-        String categoryKey = categoryFunction.apply(baseI13n, categoryName);
+        Text categoryKey = new TranslatableText(categoryFunction.apply(baseI13n, categoryName));
 
         if (!screenBuilder.hasCategory(categoryKey)) {
             ConfigCategory category = screenBuilder.getOrCreateCategory(categoryKey);
