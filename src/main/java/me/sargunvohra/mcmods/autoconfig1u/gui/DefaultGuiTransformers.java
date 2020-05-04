@@ -78,6 +78,16 @@ public class DefaultGuiTransformers {
             ConfigEntry.Gui.PrefixText.class
         );
 
+        registry.registerAnnotationTransformer(
+            (guis, i13n, field, config, defaults, guiProvider) -> {
+                for (AbstractConfigListEntry gui : guis) {
+                    gui.setRequiresRestart(field.getAnnotation(ConfigEntry.Gui.RequiresRestart.class).value());
+                }
+                return guis;
+            },
+            ConfigEntry.Gui.RequiresRestart.class
+        );
+
         return registry;
     }
 
