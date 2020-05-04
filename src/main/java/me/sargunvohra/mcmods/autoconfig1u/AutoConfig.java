@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class AutoConfig {
-    private static final Map<Class<? extends ConfigData>, ConfigHolder> holders = new HashMap<>();
+    private static final Map<Class<? extends ConfigData>, ConfigHolder<?>> holders = new HashMap<>();
     private static final Map<Class<? extends ConfigData>, GuiRegistry> guiRegistries = new HashMap<>();
 
     private AutoConfig() {
@@ -51,7 +51,6 @@ public class AutoConfig {
     public static <T extends ConfigData> ConfigHolder<T> getConfigHolder(Class<T> configClass) {
         Objects.requireNonNull(configClass);
         if (holders.containsKey(configClass)) {
-            //noinspection unchecked
             return (ConfigHolder<T>) holders.get(configClass);
         } else {
             throw new RuntimeException(String.format("Config '%s' has not been registered", configClass));
@@ -65,8 +64,7 @@ public class AutoConfig {
 
     @Environment(EnvType.CLIENT)
     public static <T extends ConfigData> Supplier<Screen> getConfigScreen(Class<T> configClass, Screen parent) {
-        //noinspection unchecked
-        return new <T>ConfigScreenProvider(
+        return new ConfigScreenProvider<>(
             (ConfigManager<T>) AutoConfig.getConfigHolder(configClass),
             new ComposedGuiRegistryAccess(
                 getGuiRegistry(configClass),
