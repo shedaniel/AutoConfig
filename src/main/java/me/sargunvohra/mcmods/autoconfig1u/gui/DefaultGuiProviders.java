@@ -4,8 +4,11 @@ import com.google.common.collect.Lists;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.ConfigEntry;
 import me.sargunvohra.mcmods.autoconfig1u.gui.registry.GuiRegistry;
 import me.sargunvohra.mcmods.autoconfig1u.gui.registry.api.GuiRegistryAccess;
+import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
+import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.EnvType;
@@ -16,9 +19,13 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.getUnsafely;
 import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
@@ -27,7 +34,7 @@ import static me.sargunvohra.mcmods.autoconfig1u.util.Utils.setUnsafely;
 public class DefaultGuiProviders {
 
     private static final ConfigEntryBuilder ENTRY_BUILDER = ConfigEntryBuilder.create();
-    private static final Function<Enum, Text> DEFAULT_NAME_PROVIDER = t -> new TranslatableText(t instanceof SelectionListEntry.Translatable ? ((SelectionListEntry.Translatable) t).getKey() : t.toString());
+    private static final Function<Enum<?>, Text> DEFAULT_NAME_PROVIDER = t -> new TranslatableText(t instanceof SelectionListEntry.Translatable ? ((SelectionListEntry.Translatable) t).getKey() : t.toString());
 
     private DefaultGuiProviders() {
     }
@@ -143,19 +150,17 @@ public class DefaultGuiProviders {
         //noinspection unchecked
         registry.registerPredicateProvider(
             (i13n, field, config, defaults, guiProvider) -> {
-                List<Enum> enums = new ArrayList<>();
-                for (Object constant : field.getType().getEnumConstants()) {
-                    enums.add((Enum) constant);
-                }
+                List<Enum<?>> enums = Arrays.asList(((Class<? extends Enum<?>>) field.getType()).getEnumConstants());
                 return Collections.singletonList(
                     ENTRY_BUILDER.startDropdownMenu(
                         new TranslatableText(i13n),
                         DropdownMenuBuilder.TopCellElementBuilder.of(
                             getUnsafely(field, config, null),
                             str -> {
-                                for (Object constant : field.getType().getEnumConstants()) {
-                                    if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
-                                        return (Enum) constant;
+                                String s = new LiteralText(str).getString();
+                                for (Enum<?> constant : enums) {
+                                    if (DEFAULT_NAME_PROVIDER.apply(constant).getString().equals(s)) {
+                                        return constant;
                                     }
                                 }
                                 return null;
@@ -172,6 +177,74 @@ public class DefaultGuiProviders {
             },
             field -> field.getType().isEnum()
         );
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startIntList(new TranslatableText(i13n), getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(Integer.class));
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startLongList(new TranslatableText(i13n), getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(Long.class));
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startFloatList(new TranslatableText(i13n), getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(Float.class));
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startDoubleList(new TranslatableText(i13n), getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(Double.class));
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> Collections.singletonList(
+            ENTRY_BUILDER.startStrList(new TranslatableText(i13n), getUnsafely(field, config))
+                .setDefaultValue(() -> getUnsafely(field, defaults))
+                .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
+                .build()
+        ), isListOfType(String.class));
+
+        registry.registerPredicateProvider((i13n, field, config, defaults, registry1) -> {
+            List<Object> configValue = getUnsafely(field, config);
+
+            Class<?> fieldTypeParam = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+
+            Object defaultElemValue = Utils.constructUnsafely(fieldTypeParam);
+
+            String remainingI13n = i13n.substring(0, i13n.indexOf(".option") + ".option".length());
+            String classI13n = String.format("%s.%s", remainingI13n, fieldTypeParam.getSimpleName());
+
+            return Collections.singletonList(
+                new NestedListListEntry<Object, MultiElementListEntry<Object>>(
+                    new TranslatableText(i13n),
+                    configValue,
+                    false,
+                    null,
+                    abstractConfigListEntries -> {
+                    },
+                    () -> getUnsafely(field, defaults),
+                    ENTRY_BUILDER.getResetButtonKey(),
+                    true,
+                    true,
+                    (elem, nestedListListEntry) -> {
+                        if (elem == null) {
+                            Object newDefaultElemValue = Utils.constructUnsafely(fieldTypeParam);
+                            return new MultiElementListEntry<>(new TranslatableText(classI13n), newDefaultElemValue, (List) getChildren(classI13n, fieldTypeParam, newDefaultElemValue, defaultElemValue, registry1), true);
+                        } else
+                            return new MultiElementListEntry<>(new TranslatableText(classI13n), elem, (List) getChildren(classI13n, fieldTypeParam, elem, defaultElemValue, registry1), true);
+                    }
+                )
+            );
+        }, isNotListOfType(Integer.class, Long.class, Float.class, Double.class, String.class));
 
         registry.registerTypeProvider(
             (i13n, field, config, defaults, guiProvider) -> Collections.singletonList(
@@ -275,10 +348,11 @@ public class DefaultGuiProviders {
     }
 
     private static List<AbstractConfigListEntry> getChildren(String i13n, Field field, Object config, Object defaults, GuiRegistryAccess guiProvider) {
-        Object iConfig = getUnsafely(field, config);
-        Object iDefaults = getUnsafely(field, defaults);
+        return getChildren(i13n, field.getType(), getUnsafely(field, config), getUnsafely(field, defaults), guiProvider);
+    }
 
-        return Arrays.stream(field.getType().getDeclaredFields())
+    private static List<AbstractConfigListEntry> getChildren(String i13n, Class<?> fieldType, Object iConfig, Object iDefaults, GuiRegistryAccess guiProvider) {
+        return Arrays.stream(fieldType.getDeclaredFields())
             .map(
                 iField -> {
                     String iI13n = String.format("%s.%s", i13n, iField.getName());
@@ -288,5 +362,39 @@ public class DefaultGuiProviders {
             .filter(Objects::nonNull)
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns a predicate that tests if the field is a list containing some particular {@link Type}s, i.e. {@code List<Integer>}.
+     *
+     * @param types the types to check for in the list's parameter
+     * @return {@code true} if the field is a list containing the provided type, {@code false} otherwise
+     */
+    private static Predicate<Field> isListOfType(Type... types) {
+        return field -> {
+            if (List.class.isAssignableFrom(field.getType()) && field.getGenericType() instanceof ParameterizedType) {
+                Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+                return args.length == 1 && Stream.of(types).anyMatch(type -> Objects.equals(args[0], type));
+            } else {
+                return false;
+            }
+        };
+    }
+
+    /**
+     * Returns a predicate that tests if the field is a list <i>not</i> containing any particular {@link Type}s, i.e. anything that isn't a {@code List<Integer>}.
+     *
+     * @param types the types to check for in the list's parameter
+     * @return {@code true} if the field is a list <i>not</i> containing any of the provided types, {@code false} otherwise
+     */
+    private static Predicate<Field> isNotListOfType(Type... types) {
+        return field -> {
+            if (List.class.isAssignableFrom(field.getType()) && field.getGenericType() instanceof ParameterizedType) {
+                Type[] args = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+                return args.length == 1 && Stream.of(types).noneMatch(type -> Objects.equals(args[0], type));
+            } else {
+                return false;
+            }
+        };
     }
 }

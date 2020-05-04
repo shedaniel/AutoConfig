@@ -64,8 +64,11 @@ dependencies {
         exclude(module = "fabric-biomes-v1")
     }
 
-    modCompile("me.shedaniel.cloth:config-2:4.0.0-unstable")
-    modCompileOnly("io.github.prospector:modmenu:1.10.2+build.32")
+    modCompile("me.shedaniel.cloth:config-2:4.0.9-unstable") {
+        exclude(group = "net.fabricmc.fabric-api")
+    }
+    modCompileOnly("io.github.prospector:modmenu:1.11.2+build.6")
+    modRuntime("io.github.prospector:modmenu:1.11.2+build.6")
 
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")
