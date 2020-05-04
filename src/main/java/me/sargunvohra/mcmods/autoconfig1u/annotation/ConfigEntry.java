@@ -104,6 +104,15 @@ public class ConfigEntry {
         }
 
         /**
+         * Requires restart if the field is modified.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface RequiresRestart {
+            boolean value() default true;
+        }
+
+        /**
          * Defines how an enum is handled
          */
         @Retention(RetentionPolicy.RUNTIME)
