@@ -135,7 +135,7 @@ public class DefaultGuiProviders {
                     ENTRY_BUILDER.startSelector(
                         i13n,
                         enums,
-                        getUnsafely(field, config, null)
+                        getUnsafely(field, config, getUnsafely(field, defaults))
                     )
                         .setDefaultValue(() -> getUnsafely(field, defaults))
                         .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
@@ -153,7 +153,7 @@ public class DefaultGuiProviders {
                     ENTRY_BUILDER.startDropdownMenu(
                         i13n,
                         DropdownMenuBuilder.TopCellElementBuilder.of(
-                            getUnsafely(field, config, null),
+                            getUnsafely(field, config, getUnsafely(field, defaults)),
                             str -> {
                                 for (Object constant : field.getType().getEnumConstants()) {
                                     if (DEFAULT_NAME_PROVIDER.apply((Enum) constant).equals(str)) {
