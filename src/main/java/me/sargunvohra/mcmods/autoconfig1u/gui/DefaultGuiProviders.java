@@ -137,7 +137,7 @@ public class DefaultGuiProviders {
                     ENTRY_BUILDER.startSelector(
                         new TranslatableText(i13n),
                         enums,
-                        getUnsafely(field, config, null)
+                        getUnsafely(field, config, getUnsafely(field, defaults))
                     )
                         .setDefaultValue(() -> getUnsafely(field, defaults))
                         .setSaveConsumer(newValue -> setUnsafely(field, config, newValue))
@@ -155,7 +155,7 @@ public class DefaultGuiProviders {
                     ENTRY_BUILDER.startDropdownMenu(
                         new TranslatableText(i13n),
                         DropdownMenuBuilder.TopCellElementBuilder.of(
-                            getUnsafely(field, config, null),
+                            getUnsafely(field, config, getUnsafely(field, defaults)),
                             str -> {
                                 String s = new LiteralText(str).getString();
                                 for (Enum<?> constant : enums) {
