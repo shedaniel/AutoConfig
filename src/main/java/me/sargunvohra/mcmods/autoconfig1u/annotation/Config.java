@@ -21,6 +21,8 @@ public @interface Config {
         @Retention(RetentionPolicy.RUNTIME)
         @Target(ElementType.TYPE)
         public @interface Background {
+            String TRANSPARENT = "cloth-config2:transparent";
+
             String value();
         }
 

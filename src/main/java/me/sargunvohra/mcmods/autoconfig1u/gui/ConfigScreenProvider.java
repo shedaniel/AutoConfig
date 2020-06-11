@@ -25,6 +25,8 @@ import static java.util.stream.Collectors.*;
 @Environment(EnvType.CLIENT)
 public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
 
+    private static final Identifier TRANSPARENT_BACKGROUND = new Identifier(Config.Gui.Background.TRANSPARENT);
+
     private final ConfigManager<T> manager;
     private final GuiRegistryAccess registry;
     private final Screen parent;
@@ -77,7 +79,10 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         if (configClass.isAnnotationPresent(Config.Gui.Background.class)) {
             String bg = configClass.getAnnotation(Config.Gui.Background.class).value();
             Identifier bgId = Identifier.tryParse(bg);
-            builder.setDefaultBackgroundTexture(bgId);
+            if (TRANSPARENT_BACKGROUND.equals(bgId))
+                builder.transparentBackground();
+            else
+                builder.setDefaultBackgroundTexture(bgId);
         }
 
         Map<String, Identifier> categoryBackgrounds =
