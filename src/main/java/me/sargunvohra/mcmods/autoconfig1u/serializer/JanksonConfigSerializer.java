@@ -8,6 +8,8 @@ import blue.endless.jankson.impl.SyntaxError;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
+import me.shedaniel.clothconfig2.api.Modifier;
+import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.util.InputUtil;
 
@@ -39,6 +41,9 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
             .registerTypeFactory(InputUtil.KeyCode.class, () -> InputUtil.UNKNOWN_KEYCODE)
             .registerTypeAdapter(InputUtil.KeyCode.class, new KeyCodeJsonTypeAdapter())
             .registerSerializer(InputUtil.KeyCode.class, new KeyCodeJsonSerializer())
+            .registerTypeFactory(ModifierKeyCode.class, ModifierKeyCode::unknown)
+            .registerTypeAdapter(ModifierKeyCode.class, new ModifierKeyCodeTypeAdapter())
+            .registerSerializer(ModifierKeyCode.class, new ModifierKeyCodeJsonSerializer())
             .build());
     }
 
@@ -81,7 +86,7 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
     // not sure how Jankson handles (de)serialization errors exactly, I'll just assume a try/catch?
     // hopefully this won't break horribly
     // - ADudeCalledLeo
-    public static class KeyCodeJsonTypeAdapter implements Function<JsonObject, InputUtil.KeyCode> {
+    private static class KeyCodeJsonTypeAdapter implements Function<JsonObject, InputUtil.KeyCode> {
         @Override
         public InputUtil.KeyCode apply(JsonObject jsonObject) {
             final InputUtil.Type type = jsonObject.get(InputUtil.Type.class, "type");
@@ -89,12 +94,32 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
             return type.createFromCode(code);
         }
     }
-    public static class KeyCodeJsonSerializer implements BiFunction<InputUtil.KeyCode, Marshaller, JsonElement> {
+    private static class KeyCodeJsonSerializer implements BiFunction<InputUtil.KeyCode, Marshaller, JsonElement> {
         @Override
         public JsonElement apply(InputUtil.KeyCode keyCode, Marshaller marshaller) {
             final JsonObject jObj = new JsonObject();
             jObj.put("type", marshaller.serialize(keyCode.getCategory()));
             jObj.put("code", marshaller.serialize(keyCode.getKeyCode()));
+            return jObj;
+        }
+    }
+
+    private static class ModifierKeyCodeTypeAdapter implements Function<JsonObject, ModifierKeyCode> {
+        @Override
+        public ModifierKeyCode apply(JsonObject jsonObject) {
+            final InputUtil.Type type = jsonObject.get(InputUtil.Type.class, "type");
+            final int code = jsonObject.get(Integer.class, "code");
+            final Modifier mod = Modifier.of(jsonObject.get(Short.class, "mod"));
+            return ModifierKeyCode.of(type.createFromCode(code), mod);
+        }
+    }
+    private static class ModifierKeyCodeJsonSerializer implements BiFunction<ModifierKeyCode, Marshaller, JsonElement> {
+        @Override
+        public JsonElement apply(ModifierKeyCode keyCode, Marshaller marshaller) {
+            final JsonObject jObj = new JsonObject();
+            jObj.put("type", marshaller.serialize(keyCode.getType()));
+            jObj.put("code", marshaller.serialize(keyCode.getKeyCode()));
+            jObj.put("mod", marshaller.serialize(keyCode.getModifier().getValue()));
             return jObj;
         }
     }
