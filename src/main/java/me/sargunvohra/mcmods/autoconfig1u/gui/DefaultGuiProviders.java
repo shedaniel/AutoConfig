@@ -6,6 +6,7 @@ import me.sargunvohra.mcmods.autoconfig1u.gui.registry.api.GuiRegistryAccess;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.api.ModifierKeyCode;
 import me.shedaniel.clothconfig2.gui.entries.MultiElementListEntry;
 import me.shedaniel.clothconfig2.gui.entries.NestedListListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
@@ -13,6 +14,7 @@ import me.shedaniel.clothconfig2.impl.builders.DropdownMenuBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.TranslatableText;
 
 import java.lang.reflect.Field;
@@ -327,6 +329,20 @@ public class DefaultGuiProviders {
             ),
             String.class
         );
+
+        registry.registerTypeProvider((i13n, field, config, defaults, registry1) ->
+            Collections.singletonList(ENTRY_BUILDER.startKeyCodeField(i13n, getUnsafely(field, config))
+                .setDefaultValue(Utils.<InputUtil.KeyCode>getUnsafely(field, defaults))
+                .setAllowKey(true).setAllowMouse(true)
+                .setSaveConsumer(keyCode -> setUnsafely(field, config, keyCode))
+                .build()), InputUtil.KeyCode.class);
+
+        registry.registerTypeProvider((i13n, field, config, defaults, registry1) ->
+            Collections.singletonList(ENTRY_BUILDER.startModifierKeyCodeField(i13n, getUnsafely(field, config))
+                .setDefaultValue(Utils.<ModifierKeyCode>getUnsafely(field, defaults))
+                .setAllowKey(true).setAllowMouse(true)
+                .setSaveConsumer(keyCode -> setUnsafely(field, config, keyCode))
+                .build()), ModifierKeyCode.class);
 
         return registry;
     }
