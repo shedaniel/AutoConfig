@@ -96,6 +96,15 @@ public class ConfigEntry {
         }
 
         /**
+         * Applies no tooltip to list entries that support it, defined in your lang file.
+         */
+        @Retention(RetentionPolicy.RUNTIME)
+        @Target(ElementType.FIELD)
+        public @interface NoTooltip {
+            
+        }
+
+        /**
          * Applies a section of text right before this entry, defined in your lang file.
          */
         @Retention(RetentionPolicy.RUNTIME)

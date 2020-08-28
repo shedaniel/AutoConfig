@@ -34,7 +34,9 @@ public class DefaultGuiTransformers {
                 .peek(gui -> {
                     if (!(gui instanceof TextListEntry)) {
                         ConfigEntry.Gui.Tooltip tooltip = field.getAnnotation(ConfigEntry.Gui.Tooltip.class);
-                        if (tooltip.count() == 1) {
+                        if (tooltip.count() == 0) {
+                            tryRemoveTooltip(gui);
+                        } else if (tooltip.count() == 1) {
                             tryApplyTooltip(
                                 gui,
                                 new Text[]{
@@ -70,6 +72,17 @@ public class DefaultGuiTransformers {
         );
 
         registry.registerAnnotationTransformer(
+            (guis, i13n, field, config, defaults, guiProvider) -> guis.stream()
+                .peek(gui -> {
+                    if (!(gui instanceof TextListEntry)) {
+                        tryRemoveTooltip(gui, text);
+                    }
+                })
+                .collect(Collectors.toList()),
+            ConfigEntry.Gui.NoTooltip.class
+        );
+
+        registry.registerAnnotationTransformer(
             (guis, i13n, field, config, defaults, guiProvider) -> {
                 ArrayList<AbstractConfigListEntry> ret = new ArrayList<>(guis);
                 String text = String.format("%s.%s", i13n, "@PrefixText");
@@ -96,6 +109,13 @@ public class DefaultGuiTransformers {
         if (gui instanceof TooltipListEntry) {
             TooltipListEntry tooltipGui = (TooltipListEntry) gui;
             tooltipGui.setTooltipSupplier(() -> Optional.of(text));
+        }
+    }
+
+    private static void tryRemoveTooltip(AbstractConfigListEntry gui) {
+        if (gui instanceof TooltipListEntry) {
+            TooltipListEntry tooltipGui = (TooltipListEntry) gui;
+            tooltipGui.setTooltipSupplier(() -> Optional.empty());
         }
     }
 }
