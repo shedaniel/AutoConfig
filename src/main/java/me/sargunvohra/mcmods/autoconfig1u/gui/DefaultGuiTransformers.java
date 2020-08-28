@@ -75,7 +75,7 @@ public class DefaultGuiTransformers {
             (guis, i13n, field, config, defaults, guiProvider) -> guis.stream()
                 .peek(gui -> {
                     if (!(gui instanceof TextListEntry)) {
-                        tryRemoveTooltip(gui, text);
+                        tryRemoveTooltip(gui);
                     }
                 })
                 .collect(Collectors.toList()),
