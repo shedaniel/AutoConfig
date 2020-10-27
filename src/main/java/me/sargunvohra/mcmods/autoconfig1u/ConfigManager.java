@@ -55,6 +55,14 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
 
     private boolean load() {
         try {
+            if (!config.equals(serializer.deserialize())){
+                ActionResult result = ConfigChangedEvent.SAVED.invoker().onSave(this);
+                if (result == ActionResult.FAIL){
+                    config = serializer.createDefault();
+                    config.validatePostLoad();
+                    return false;
+                }
+            }
             config = serializer.deserialize();
             config.validatePostLoad();
             return true;

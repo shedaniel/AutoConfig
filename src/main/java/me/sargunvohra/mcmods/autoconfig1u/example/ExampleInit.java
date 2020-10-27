@@ -25,7 +25,7 @@ public class ExampleInit implements ModInitializer {
         //this event allows you to change or register specific listeners
         // for when the config has changed
         ConfigChangedEvent.SAVED.register(manager -> {
-        //    System.out.println("Used a manager save event!");
+         System.out.println(manager.getConfig());
             return ActionResult.SUCCESS;
         });
     }
