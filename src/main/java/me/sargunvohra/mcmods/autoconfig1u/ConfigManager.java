@@ -1,7 +1,9 @@
 package me.sargunvohra.mcmods.autoconfig1u;
 
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
+import me.sargunvohra.mcmods.autoconfig1u.event.ConfigChangedEvent;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.ConfigSerializer;
+import net.minecraft.util.ActionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,6 +42,10 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
     }
 
     public void save() {
+        ActionResult result = ConfigChangedEvent.SAVED.invoker().onSave(this);
+        if(result == ActionResult.FAIL) {
+            return;
+        }
         try {
             serializer.serialize(config);
         } catch (ConfigSerializer.SerializationException e) {
