@@ -12,14 +12,11 @@ plugins {
     id("java")
     id("idea")
     id("maven-publish")
-//    signing
-//    id("com.jfrog.bintray") version "1.8.4"
+    id("signing")
+    id("com.jfrog.bintray") version "1.8.4"
     id("fabric-loom") version("0.5-SNAPSHOT")
-//    id("com.palantir.git-version") version "0.11.0"
     id("com.github.johnrengelman.shadow") version("5.0.0")
 }
-
-//import com.jfrog.bintray.gradle.BintrayExtension
 
 java {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -27,7 +24,7 @@ java {
 }
 
 repositories {
-    maven{url "https://maven.fabricmc.net/"}
+    maven { url "https://maven.fabricmc.net/" }
     jcenter()
 }
 
@@ -103,27 +100,27 @@ jar {
     from("LICENSE")
 }
 
-//bintray {
-//    user = System.getenv("BINTRAY_USER")
-//    key = System.getenv("BINTRAY_KEY")
-//    setPublications("mavenJava")
-//    publish = true
-//    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
-//        repo = "autoconfig1u"
-//        name = "autoconfig1u"
-//        userOrg = "shedaniel"
-//        setLicenses("Apache-2.0")
-//        version.apply {
-//            name = modVersion
-//            vcsTag = modVersion
-//            githubRepo = "shedaniel/AutoConfig"
-//            websiteUrl = "https://github.com/shedaniel/AutoConfig"
-//            issueTrackerUrl = "https://github.com/shedaniel/AutoConfig/issues"
-//            vcsUrl = "https://github.com/shedaniel/AutoConfig.git"
-//            gpg.sign = true
-//        }
-//    })
-//}
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    setPublications("mavenJava")
+    publish = true
+    pkg {
+        repo = "autoconfig1u"
+        name = "autoconfig1u"
+        userOrg = "shedaniel"
+        licenses = ["Apache-2.0"]
+        version {
+            name = modVersion
+            vcsTag = modVersion
+            githubRepo = "shedaniel/AutoConfig"
+            websiteUrl = "https://github.com/shedaniel/AutoConfig"
+            issueTrackerUrl = "https://github.com/shedaniel/AutoConfig/issues"
+            vcsUrl = "https://github.com/shedaniel/AutoConfig.git"
+            gpg.sign = true
+        }
+    }
+}
 
 remapJar {
     dependsOn(shadowJar)
