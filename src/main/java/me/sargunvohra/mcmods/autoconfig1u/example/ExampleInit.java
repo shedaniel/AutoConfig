@@ -2,7 +2,6 @@ package me.sargunvohra.mcmods.autoconfig1u.example;
 
 import me.sargunvohra.mcmods.autoconfig1u.AutoConfig;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigHolder;
-import me.sargunvohra.mcmods.autoconfig1u.event.ConfigChangedEvent;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.DummyConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import net.fabricmc.api.ModInitializer;
@@ -20,12 +19,14 @@ public class ExampleInit implements ModInitializer {
 
         // how to read a config:
         holder.getConfig();
-        // or
+        // or (please cache this value)
         AutoConfig.getConfigHolder(ExampleConfig.class).getConfig();
-        //this event allows you to change or register specific listeners
+        // this event allows you to change or register specific listeners
         // for when the config has changed
-        ConfigChangedEvent.SAVED.register(manager -> {
-         System.out.println(manager.getConfig());
+        AutoConfig.getConfigHolder(ExampleConfig.class).registerSaveListener((manager, data) -> {
+            return ActionResult.SUCCESS;
+        });
+        AutoConfig.getConfigHolder(ExampleConfig.class).registerLoadListener((manager, newData) -> {
             return ActionResult.SUCCESS;
         });
     }

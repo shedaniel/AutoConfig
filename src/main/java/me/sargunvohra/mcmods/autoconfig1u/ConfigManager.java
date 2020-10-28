@@ -1,19 +1,44 @@
 package me.sargunvohra.mcmods.autoconfig1u;
 
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
-import me.sargunvohra.mcmods.autoconfig1u.event.ConfigChangedEvent;
+import me.sargunvohra.mcmods.autoconfig1u.event.ConfigSerializeEvent;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.ConfigSerializer;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.util.ActionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 
+@ApiStatus.Internal
 public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
-
     private final Logger logger;
-
     private final Config definition;
     private final Class<T> configClass;
     private final ConfigSerializer<T> serializer;
+    private final Event<ConfigSerializeEvent.Save<T>> saveEvent = EventFactory.createArrayBacked(ConfigSerializeEvent.Save.class,
+        (listeners) -> (config, data) -> {
+            for (ConfigSerializeEvent.Save<T> listener : listeners) {
+                ActionResult result = listener.onSave(config, data);
+                if (result != ActionResult.PASS) {
+                    return result;
+                }
+            }
+
+            return ActionResult.PASS;
+        });
+    private final Event<ConfigSerializeEvent.Load<T>> loadEvent = EventFactory.createArrayBacked(ConfigSerializeEvent.Load.class,
+        (listeners) -> (config, newData) -> {
+            for (ConfigSerializeEvent.Load<T> listener : listeners) {
+                ActionResult result = listener.onLoad(config, newData);
+                if (result != ActionResult.PASS) {
+                    return result;
+                }
+            }
+
+            return ActionResult.PASS;
+        });
 
     private T config;
 
@@ -33,6 +58,8 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
         return definition;
     }
 
+    @Override
+    @NotNull
     public Class<T> getConfigClass() {
         return configClass;
     }
@@ -41,9 +68,9 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
         return serializer;
     }
 
+    @Override
     public void save() {
-        ActionResult result = ConfigChangedEvent.SAVED.invoker().onSave(this);
-        if(result == ActionResult.FAIL) {
+        if (saveEvent.invoker().onSave(this, config) == ActionResult.FAIL) {
             return;
         }
         try {
@@ -53,17 +80,19 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
         }
     }
 
-    private boolean load() {
+    @Override
+    public boolean load() {
         try {
-            if (!config.equals(serializer.deserialize())){
-                ActionResult result = ConfigChangedEvent.SAVED.invoker().onSave(this);
-                if (result == ActionResult.FAIL){
+            T deserialized = serializer.deserialize();
+            if (!config.equals(deserialized)) {
+                ActionResult result = loadEvent.invoker().onLoad(this, deserialized);
+                if (result == ActionResult.FAIL) {
                     config = serializer.createDefault();
                     config.validatePostLoad();
                     return false;
                 }
             }
-            config = serializer.deserialize();
+            config = deserialized;
             config.validatePostLoad();
             return true;
         } catch (ConfigSerializer.SerializationException | ConfigData.ValidationException e) {
@@ -81,5 +110,15 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
     @Override
     public T getConfig() {
         return config;
+    }
+
+    @Override
+    public void registerLoadListener(ConfigSerializeEvent.Load<T> load) {
+        this.loadEvent.register(load);
+    }
+
+    @Override
+    public void registerSaveListener(ConfigSerializeEvent.Save<T> save) {
+        this.saveEvent.register(save);
     }
 }

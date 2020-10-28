@@ -36,7 +36,7 @@ public class GsonConfigSerializer<T extends ConfigData> implements ConfigSeriali
     }
 
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(definition.name() + ".json");
+        return FabricLoader.getInstance().getConfigDir().resolve(definition.name() + ".json");
     }
 
     @Override

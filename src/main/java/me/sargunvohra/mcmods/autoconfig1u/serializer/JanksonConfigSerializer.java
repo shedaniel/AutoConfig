@@ -1,7 +1,7 @@
 package me.sargunvohra.mcmods.autoconfig1u.serializer;
 
 import blue.endless.jankson.Jankson;
-import blue.endless.jankson.impl.SyntaxError;
+import blue.endless.jankson.api.SyntaxError;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
@@ -33,7 +33,7 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
     }
 
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(definition.name() + ".json5");
+        return FabricLoader.getInstance().getConfigDir().resolve(definition.name() + ".json5");
     }
 
     @Override

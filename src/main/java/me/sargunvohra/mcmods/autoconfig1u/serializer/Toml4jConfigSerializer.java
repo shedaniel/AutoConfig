@@ -33,7 +33,7 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
     }
 
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDirectory().toPath().resolve(definition.name() + ".toml");
+        return FabricLoader.getInstance().getConfigDir().resolve(definition.name() + ".toml");
     }
 
     @Override
