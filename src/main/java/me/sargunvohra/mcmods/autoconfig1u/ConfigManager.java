@@ -3,9 +3,9 @@ package me.sargunvohra.mcmods.autoconfig1u;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.event.ConfigSerializeEvent;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.ConfigSerializer;
+import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.mappings.model.CommentEntry;
 import net.minecraft.util.ActionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -85,18 +85,12 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
     public boolean load() {
         try {
             T deserialized = serializer.deserialize();
-         //   System.out.println(deserialized);
-//            System.out.println(config);
-            if (config != null) {
-                if (!config.equals(deserialized)) {
                     ActionResult result = loadEvent.invoker().onLoad(this, deserialized);
                     if (result == ActionResult.FAIL) {
                         config = serializer.createDefault();
                         config.validatePostLoad();
                         return false;
                     }
-                }
-            }
             config = deserialized;
             config.validatePostLoad();
             return true;
