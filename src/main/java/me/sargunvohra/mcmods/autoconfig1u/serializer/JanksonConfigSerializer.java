@@ -1,7 +1,6 @@
 package me.sargunvohra.mcmods.autoconfig1u.serializer;
 
 import blue.endless.jankson.Jankson;
-import blue.endless.jankson.api.SyntaxError;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
@@ -55,7 +54,7 @@ public class JanksonConfigSerializer<T extends ConfigData> implements ConfigSeri
         if (Files.exists(configPath)) {
             try {
                 return jankson.fromJson(jankson.load(getConfigPath().toFile()), configClass);
-            } catch (IOException | SyntaxError e) {
+            } catch (Throwable e) {
                 throw new SerializationException(e);
             }
         } else {

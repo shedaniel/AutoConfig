@@ -40,16 +40,21 @@ dependencies {
     mappings("net.fabricmc:yarn:$yarn_mappings:v2")
     modCompile("net.fabricmc:fabric-loader:$loader_version")
     dependModule("fabric-api-base", fabric_version)
+    dependModule("fabric-resource-loader-v0", fabric_version, false)
 
     modCompileOnly("me.shedaniel.cloth:config-2:4.0.9-unstable") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modCompileOnly("io.github.prospector:modmenu:1.11.2+build.6")
-    modRuntime("io.github.prospector:modmenu:1.11.2+build.6")
+    modCompileOnly("io.github.prospector:modmenu:1.11.2+build.6") {
+        transitive = false
+    }
+    modRuntime("io.github.prospector:modmenu:1.11.2+build.6") {
+        transitive = false
+    }
 
-    shadow("blue.endless:jankson:1.2.+")
-    implementation("blue.endless:jankson:1.2.+")
+    shadow("blue.endless:jankson:1.1.+")
+    implementation("blue.endless:jankson:1.1.+")
 
     shadow("com.moandjiezana.toml:toml4j:0.7.+") {
         exclude(group: "com.google.code.gson", module: "gson")
@@ -57,18 +62,19 @@ dependencies {
     implementation("com.moandjiezana.toml:toml4j:0.7.+")
 }
 
-def dependModule(moduleName, fapiVersion) {
-    depend("net.fabricmc.fabric-api:$moduleName:${fabricApi.moduleVersion(moduleName, fapiVersion)}")
+def dependModule(moduleName, fapiVersion, include = true) {
+    depend("net.fabricmc.fabric-api:$moduleName:${fabricApi.moduleVersion(moduleName, fapiVersion)}", include)
 }
 
-def depend(str) {
+def depend(str, include = true) {
     dependencies.modRuntime(str) {
         exclude(module: "fabric-biomes-v1")
     }
     dependencies.modCompileOnly(str) {
         exclude(module: "fabric-biomes-v1")
     }
-    dependencies.include(str)
+    if (include)
+        dependencies.include(str)
 }
 
 processResources {

@@ -5,7 +5,7 @@
     "name": "Auto Config v1 Updated",
     "description": "Annotation based API for mod configs, with Cloth Config GUI integration",
     "authors": [
-        "sargunv"
+        "sargunv", "shedaniel"
     ],
     "contact": {
         "homepage": "https://gitlab.com/sargunv-mc-mods/auto-config/wikis/home",
