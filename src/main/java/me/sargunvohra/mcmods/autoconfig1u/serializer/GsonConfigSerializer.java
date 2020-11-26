@@ -32,7 +32,7 @@ public class GsonConfigSerializer<T extends ConfigData> implements ConfigSeriali
     }
 
     public GsonConfigSerializer(Config definition, Class<T> configClass) {
-        this(definition, configClass, new GsonBuilder().setPrettyPrinting().create());
+        this(definition, configClass, new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create());
     }
 
     private Path getConfigPath() {
