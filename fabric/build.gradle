@@ -86,3 +86,34 @@ publishing {
         }
     }
 }
+
+curseforge {
+    if (project.hasProperty("curse_api_key") || System.getenv("curse_api_key") != null) {
+        apiKey = project.hasProperty("curse_api_key") ? project.property("curse_api_key") : System.getenv("curse_api_key")
+        project {
+            id = project.curseforge_id_fabric
+            releaseType = "release"
+            addGameVersion "1.16-Snapshot"
+            addGameVersion "1.16.4"
+            addGameVersion "1.16.5"
+            addGameVersion "Java 8"
+            addGameVersion "Fabric"
+            relations {
+                requiredDependency "architectury-fabric"
+                requiredDependency "fabric-api"
+            }
+            mainArtifact(remapJar.archivePath) {
+                displayName = "[Fabric $rootProject.supported_version] v$project.version"
+            }
+            afterEvaluate {
+                uploadTask.dependsOn("build")
+            }
+        }
+    }
+    options {
+        forgeGradleIntegration = false
+        javaVersionAutoDetect = false
+    }
+}
+
+rootProject.tasks.getByName("curseforgePublish").dependsOn tasks.getByName("curseforge")
