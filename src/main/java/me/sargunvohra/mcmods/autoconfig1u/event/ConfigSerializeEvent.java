@@ -2,7 +2,7 @@ package me.sargunvohra.mcmods.autoconfig1u.event;
 
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigHolder;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 
 public final class ConfigSerializeEvent {
     private ConfigSerializeEvent() {}
@@ -22,7 +22,7 @@ public final class ConfigSerializeEvent {
          * will result in an exception
          * <p>
          */
-        ActionResult onSave(ConfigHolder<T> manager, T data);
+        InteractionResult onSave(ConfigHolder<T> manager, T data);
     }
 
     @FunctionalInterface
@@ -42,6 +42,6 @@ public final class ConfigSerializeEvent {
          * Also avoid calling {@link ConfigHolder#load()} in this callback, as it
          * will result in an exception
          */
-        ActionResult onLoad(ConfigHolder<T> manager, T newData);
+        InteractionResult onLoad(ConfigHolder<T> manager, T newData);
     }
 }

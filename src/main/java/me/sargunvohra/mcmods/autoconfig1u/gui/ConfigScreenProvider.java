@@ -9,11 +9,10 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -27,7 +26,7 @@ import static java.util.stream.Collectors.*;
 @Environment(EnvType.CLIENT)
 public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Screen> {
 
-    private static final Identifier TRANSPARENT_BACKGROUND = new Identifier(Config.Gui.Background.TRANSPARENT);
+    private static final ResourceLocation TRANSPARENT_BACKGROUND = new ResourceLocation(Config.Gui.Background.TRANSPARENT);
 
     private final ConfigManager<T> manager;
     private final GuiRegistryAccess registry;
@@ -74,25 +73,25 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
 
         String i13n = i13nFunction.apply(manager);
 
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableText(String.format("%s.title", i13n))).setSavingRunnable(manager::save);
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableComponent(String.format("%s.title", i13n))).setSavingRunnable(manager::save);
 
         Class<T> configClass = manager.getConfigClass();
 
         if (configClass.isAnnotationPresent(Config.Gui.Background.class)) {
             String bg = configClass.getAnnotation(Config.Gui.Background.class).value();
-            Identifier bgId = Identifier.tryParse(bg);
+            ResourceLocation bgId = ResourceLocation.tryParse(bg);
             if (TRANSPARENT_BACKGROUND.equals(bgId))
                 builder.transparentBackground();
             else
                 builder.setDefaultBackgroundTexture(bgId);
         }
 
-        Map<String, Identifier> categoryBackgrounds =
+        Map<String, ResourceLocation> categoryBackgrounds =
             Arrays.stream(configClass.getAnnotationsByType(Config.Gui.CategoryBackground.class))
                 .collect(
                     toMap(
                         Config.Gui.CategoryBackground::category,
-                        ann -> new Identifier(ann.background())
+                        ann -> new ResourceLocation(ann.background())
                     )
                 );
 
@@ -120,7 +119,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
     private ConfigCategory getOrCreateCategoryForField(
         Field field,
         ConfigBuilder screenBuilder,
-        Map<String, Identifier> backgroundMap,
+        Map<String, ResourceLocation> backgroundMap,
         String baseI13n
     ) {
         String categoryName = "default";
@@ -128,7 +127,7 @@ public class ConfigScreenProvider<T extends ConfigData> implements Supplier<Scre
         if (field.isAnnotationPresent(ConfigEntry.Category.class))
             categoryName = field.getAnnotation(ConfigEntry.Category.class).value();
 
-        Text categoryKey = new TranslatableText(categoryFunction.apply(baseI13n, categoryName));
+        Component categoryKey = new TranslatableComponent(categoryFunction.apply(baseI13n, categoryName));
 
         if (!screenBuilder.hasCategory(categoryKey)) {
             ConfigCategory category = screenBuilder.getOrCreateCategory(categoryKey);

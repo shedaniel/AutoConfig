@@ -14,7 +14,7 @@ plugins {
     id("maven-publish")
     id("signing")
     id("com.jfrog.bintray") version "1.8.4"
-    id("fabric-loom") version("0.5-SNAPSHOT")
+    id "forgified-fabric-loom" version "0.6.54"
     id("com.github.johnrengelman.shadow") version("5.0.0")
 }
 
@@ -37,19 +37,17 @@ minecraft {
 
 dependencies {
     minecraft("com.mojang:minecraft:$minecraft_version")
-    mappings("net.fabricmc:yarn:$yarn_mappings:v2")
+    mappings minecraft.officialMojangMappings()
+
     modCompile("net.fabricmc:fabric-loader:$loader_version")
     dependModule("fabric-api-base", fabric_version)
     dependModule("fabric-resource-loader-v0", fabric_version, false)
 
-    modCompileOnly("me.shedaniel.cloth:config-2:4.0.9-unstable") {
+    modImplementation("me.shedaniel.cloth:config-2:4.8.3") {
         exclude(group: "net.fabricmc.fabric-api")
     }
 
-    modCompileOnly("io.github.prospector:modmenu:1.11.2+build.6") {
-        transitive = false
-    }
-    modRuntime("io.github.prospector:modmenu:1.11.2+build.6") {
+    modImplementation("io.github.prospector:modmenu:1.14.6+") {
         transitive = false
     }
 

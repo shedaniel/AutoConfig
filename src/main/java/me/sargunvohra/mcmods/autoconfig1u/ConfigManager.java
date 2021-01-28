@@ -6,7 +6,7 @@ import me.sargunvohra.mcmods.autoconfig1u.serializer.ConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -21,24 +21,24 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
     private final Event<ConfigSerializeEvent.Save<T>> saveEvent = EventFactory.createArrayBacked(ConfigSerializeEvent.Save.class,
         (listeners) -> (config, data) -> {
             for (ConfigSerializeEvent.Save<T> listener : listeners) {
-                ActionResult result = listener.onSave(config, data);
-                if (result != ActionResult.PASS) {
+                InteractionResult result = listener.onSave(config, data);
+                if (result != InteractionResult.PASS) {
                     return result;
                 }
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
     private final Event<ConfigSerializeEvent.Load<T>> loadEvent = EventFactory.createArrayBacked(ConfigSerializeEvent.Load.class,
         (listeners) -> (config, newData) -> {
             for (ConfigSerializeEvent.Load<T> listener : listeners) {
-                ActionResult result = listener.onLoad(config, newData);
-                if (result != ActionResult.PASS) {
+                InteractionResult result = listener.onLoad(config, newData);
+                if (result != InteractionResult.PASS) {
                     return result;
                 }
             }
 
-            return ActionResult.PASS;
+            return InteractionResult.PASS;
         });
 
     private T config;
@@ -71,7 +71,7 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
 
     @Override
     public void save() {
-        if (saveEvent.invoker().onSave(this, config) == ActionResult.FAIL) {
+        if (saveEvent.invoker().onSave(this, config) == InteractionResult.FAIL) {
             return;
         }
         try {
@@ -85,8 +85,8 @@ public class ConfigManager<T extends ConfigData> implements ConfigHolder<T> {
     public boolean load() {
         try {
             T deserialized = serializer.deserialize();
-                    ActionResult result = loadEvent.invoker().onLoad(this, deserialized);
-                    if (result == ActionResult.FAIL) {
+                    InteractionResult result = loadEvent.invoker().onLoad(this, deserialized);
+                    if (result == InteractionResult.FAIL) {
                         config = serializer.createDefault();
                         config.validatePostLoad();
                         return false;

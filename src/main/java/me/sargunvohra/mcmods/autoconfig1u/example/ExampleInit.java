@@ -5,7 +5,7 @@ import me.sargunvohra.mcmods.autoconfig1u.ConfigHolder;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.DummyConfigSerializer;
 import me.sargunvohra.mcmods.autoconfig1u.serializer.PartitioningSerializer;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 
 @SuppressWarnings("unused") // entrypoint
 public class ExampleInit implements ModInitializer {
@@ -24,10 +24,10 @@ public class ExampleInit implements ModInitializer {
         // this event allows you to change or register specific listeners
         // for when the config has changed
         AutoConfig.getConfigHolder(ExampleConfig.class).registerSaveListener((manager, data) -> {
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
         AutoConfig.getConfigHolder(ExampleConfig.class).registerLoadListener((manager, newData) -> {
-            return ActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         });
     }
 }
