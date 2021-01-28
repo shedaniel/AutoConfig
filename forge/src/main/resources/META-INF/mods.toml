@@ -1,0 +1,34 @@
+modLoader = "javafml"
+loaderVersion = "[33,)"
+issueTrackerURL = "https://github.com/shedaniel/AutoConfig/issues"
+license = "Apache-2.0"
+
+[[mods]]
+modId = "autoconfig1u"
+version = "${version}"
+displayName = "Auto Config v1 Updated"
+authors = ["sargunv", "shedaniel"]
+description = '''
+Annotation based API for mod configs, with Cloth Config GUI integration.
+'''
+
+[[dependencies.autoconfig1u]]
+modId = "forge"
+mandatory = true
+versionRange = "[33,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.autoconfig1u]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.16.2,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.autoconfig1u]]
+modId = "architectury"
+mandatory = true
+versionRange = "[1.2,)"
+ordering = "AFTER"
+side = "BOTH"

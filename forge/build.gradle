@@ -22,6 +22,12 @@ dependencies {
 
     forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
 
+    modCompile("me.shedaniel:architectury:${rootProject.architectury_version}:forge")
+
+    // cloth config (TODO: this is a local build, DO NOT try to build with this)
+    modImplementation("me.shedaniel.cloth:ClothConfig:${cloth_version}:forge")
+    modApi("me.shedaniel.cloth:basic-math:0.5.1")
+
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")
 
@@ -51,9 +57,9 @@ processResources {
 shadowJar {
     relocate "blue.endless.jankson", "${rootProject.base_group}.shadowed.blue.endless.jankson"
     relocate "com.moandjiezana.toml", "${rootProject.base_group}.shadowed.com.moandjiezana.toml"
-    
+
     exclude "fabric.mod.json"
-    
+
     configurations = [project.configurations.shadow]
     classifier "shadow"
 }

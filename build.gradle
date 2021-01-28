@@ -20,6 +20,11 @@ subprojects {
 }
 
 allprojects {
+
+    repositories {
+        mavenLocal()
+    }
+
     apply plugin: 'java'
     apply plugin: 'architectury-plugin'
 

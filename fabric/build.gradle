@@ -19,10 +19,22 @@ architectury {
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
     mappings minecraft.officialMojangMappings()
-    
+
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
-    modCompileOnly "io.github.prospector:modmenu:${rootProject.mod_menu_version}"
+
+    modCompile("me.shedaniel:architectury:${rootProject.architectury_version}:fabric")
+
+    // cloth config (TODO: this is a local build, DO NOT try to build with this)
+    modImplementation("me.shedaniel.cloth:ClothConfig:4.9.9999:fabric")
+    modApi("me.shedaniel.cloth:basic-math:0.5.1")
+
+    modCompileOnly("io.github.prospector:modmenu:${mod_menu_version}") {
+        transitive(false)
+    }
+    modRuntime("io.github.prospector:modmenu:${mod_menu_version}") {
+        transitive(false)
+    }
 
     shadow("blue.endless:jankson:1.1.+")
     implementation("blue.endless:jankson:1.1.+")
@@ -53,7 +65,7 @@ processResources {
 shadowJar {
     relocate "blue.endless.jankson", "${rootProject.base_group}.shadowed.blue.endless.jankson"
     relocate "com.moandjiezana.toml", "${rootProject.base_group}.shadowed.com.moandjiezana.toml"
-    
+
     configurations = [project.configurations.shadow]
     classifier "shadow"
 }

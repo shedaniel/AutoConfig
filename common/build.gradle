@@ -1,3 +1,7 @@
+repositories {
+    mavenLocal()
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
     mappings minecraft.officialMojangMappings()
@@ -7,11 +11,15 @@ dependencies {
 
     modCompile "me.shedaniel:architectury:${rootProject.architectury_version}"
     compileOnly "com.google.code.findbugs:jsr305:3.+"
-    
+
+    // cloth config (TODO: this is a local build, DO NOT try to build with this)
+    modImplementation("me.shedaniel.cloth:ClothConfig:${cloth_version}")
+    modImplementation("me.shedaniel.cloth:basic-math:0.5.1")
+
     // Config drivers: jankson and toml4j
     implementation("blue.endless:jankson:1.1.+")
     implementation("com.moandjiezana.toml:toml4j:0.7.+")
-    
+
 }
 
 architectury {

@@ -1,0 +1,37 @@
+{
+    "schemaVersion": 1,
+    "id": "autoconfig1u",
+    "version": "${version}",
+    "name": "Auto Config v1 Updated",
+    "description": "Annotation based API for mod configs, with Cloth Config GUI integration",
+    "authors": [
+        "sargunv",
+        "shedaniel"
+    ],
+    "contact": {
+        "homepage": "https://gitlab.com/sargunv-mc-mods/auto-config/wikis/home",
+        "sources": "https://github.com/shedaniel/AutoConfig",
+        "issues": "https://github.com/shedaniel/AutoConfig/issues"
+    },
+    "license": "Apache-2.0",
+    "icon": "assets/autoconfig1u/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "main": [
+            "me.sargunvohra.mcmods.autoconfig1u.fabric.example.ExampleInit"
+        ],
+        "client": [
+            "me.sargunvohra.mcmods.autoconfig1u.fabric.example.ExampleInitClient"
+        ],
+        "modmenu": [
+            "me.sargunvohra.mcmods.autoconfig1u.fabric.example.ExampleModMenuCompat"
+        ]
+    },
+    "mixins": [],
+    "depends": {
+        "architectury": ">=1.2"
+    },
+    "custom": {
+        "modmenu:api": true
+    }
+}
