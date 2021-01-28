@@ -5,7 +5,7 @@ import com.moandjiezana.toml.TomlWriter;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
-import net.fabricmc.loader.api.FabricLoader;
+import me.shedaniel.architectury.platform.Platform;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,7 +33,7 @@ public class Toml4jConfigSerializer<T extends ConfigData> implements ConfigSeria
     }
     
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().resolve(definition.name() + ".toml");
+        return Platform.getConfigFolder().resolve(definition.name() + ".toml");
     }
     
     @Override

@@ -6,7 +6,7 @@ import com.google.gson.JsonParseException;
 import me.sargunvohra.mcmods.autoconfig1u.ConfigData;
 import me.sargunvohra.mcmods.autoconfig1u.annotation.Config;
 import me.sargunvohra.mcmods.autoconfig1u.util.Utils;
-import net.fabricmc.loader.api.FabricLoader;
+import me.shedaniel.architectury.platform.Platform;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -36,7 +36,7 @@ public class GsonConfigSerializer<T extends ConfigData> implements ConfigSeriali
     }
     
     private Path getConfigPath() {
-        return FabricLoader.getInstance().getConfigDir().resolve(definition.name() + ".json");
+        return Platform.getConfigFolder().resolve(definition.name() + ".json");
     }
     
     @Override
