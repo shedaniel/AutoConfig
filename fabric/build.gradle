@@ -1,0 +1,76 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.matthewprenger.cursegradle"
+}
+
+configurations {
+    shadow
+    dev
+}
+
+artifacts {
+    dev(jar)
+}
+
+architectury {
+    platformSetupLoomIde()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+    mappings minecraft.officialMojangMappings()
+    
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+    modCompileOnly "io.github.prospector:modmenu:${rootProject.mod_menu_version}"
+
+    shadow("blue.endless:jankson:1.1.+")
+    implementation("blue.endless:jankson:1.1.+")
+
+    shadow("com.moandjiezana.toml:toml4j:0.7.+") {
+        exclude(group: "com.google.code.gson", module: "gson")
+    }
+    implementation("com.moandjiezana.toml:toml4j:0.7.+")
+
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentFabric")) {
+        transitive = false
+    }
+    shadow(project(path: ":common", configuration: "transformProductionFabric")) {
+        transitive = false
+    }
+}
+
+processResources {
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+    inputs.property "version", project.version
+}
+
+shadowJar {
+    relocate "blue.endless.jankson", "${rootProject.base_group}.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.base_group}.shadowed.com.moandjiezana.toml"
+    
+    configurations = [project.configurations.shadow]
+    classifier "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archiveFile)
+    archiveClassifier = "fabric"
+}
+
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifact(remapJar.archivePath) {
+                builtBy build
+                classifier "fabric"
+            }
+        }
+    }
+}

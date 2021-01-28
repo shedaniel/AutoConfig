@@ -1,0 +1,76 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.matthewprenger.cursegradle"
+}
+
+configurations {
+    shadow
+    dev
+}
+
+artifacts {
+    dev(jar)
+}
+
+architectury {
+    platformSetupLoomIde()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
+    mappings minecraft.officialMojangMappings()
+
+    forge "net.minecraftforge:forge:${rootProject.architectury.minecraft}-${rootProject.forge_version}"
+
+    shadow("blue.endless:jankson:1.1.+")
+    implementation("blue.endless:jankson:1.1.+")
+
+    shadow("com.moandjiezana.toml:toml4j:0.7.+") {
+        exclude(group: "com.google.code.gson", module: "gson")
+    }
+    implementation("com.moandjiezana.toml:toml4j:0.7.+")
+
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common", configuration: "transformDevelopmentForge")) {
+        transitive = false
+    }
+    shadow(project(path: ":common", configuration: "transformProductionForge")) {
+        transitive = false
+    }
+}
+
+processResources {
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+    inputs.property "META-INF/mods.toml", project.version
+}
+
+shadowJar {
+    relocate "blue.endless.jankson", "${rootProject.base_group}.shadowed.blue.endless.jankson"
+    relocate "com.moandjiezana.toml", "${rootProject.base_group}.shadowed.com.moandjiezana.toml"
+    
+    exclude "fabric.mod.json"
+    
+    configurations = [project.configurations.shadow]
+    classifier "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    input.set(shadowJar.archiveFile)
+    archiveClassifier = "fabric"
+}
+
+publishing {
+    publications {
+        mavenForge(MavenPublication) {
+            artifact(remapJar.archivePath) {
+                builtBy build
+                classifier "forge"
+            }
+        }
+    }
+}

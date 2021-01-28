@@ -1,113 +1,62 @@
-buildscript {
-    dependencies {
-        classpath "org.ow2.asm:asm:${project.asm_version}"
-        classpath "org.ow2.asm:asm-analysis:${project.asm_version}"
-        classpath "org.ow2.asm:asm-commons:${project.asm_version}"
-        classpath "org.ow2.asm:asm-tree:${project.asm_version}"
-        classpath "org.ow2.asm:asm-util:${project.asm_version}"
-    }
-}
-
 plugins {
-    id("java")
-    id("idea")
-    id("maven-publish")
-    id("signing")
-    id("com.jfrog.bintray") version "1.8.4"
-    id "forgified-fabric-loom" version "0.6.54"
-    id("com.github.johnrengelman.shadow") version("5.0.0")
+    id "architectury-plugin" version "2.0.65"
+    id "forgified-fabric-loom" version "0.6.54" apply false
+    id 'com.jfrog.bintray' version '1.8.4'
+    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
+    id 'maven-publish'
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+architectury {
+    minecraft = rootProject.minecraft_version
 }
 
-repositories {
-    maven { url "https://maven.fabricmc.net/" }
-    jcenter()
-}
+subprojects {
+    apply plugin: "forgified-fabric-loom"
 
-version = modVersion
-group = modMavenGroup
-archivesBaseName = modJarBaseName
-
-minecraft {
-}
-
-dependencies {
-    minecraft("com.mojang:minecraft:$minecraft_version")
-    mappings minecraft.officialMojangMappings()
-
-    modCompile("net.fabricmc:fabric-loader:$loader_version")
-    dependModule("fabric-api-base", fabric_version)
-    dependModule("fabric-resource-loader-v0", fabric_version, false)
-
-    modImplementation("me.shedaniel.cloth:config-2:4.8.3") {
-        exclude(group: "net.fabricmc.fabric-api")
-    }
-
-    modImplementation("io.github.prospector:modmenu:1.14.6+") {
-        transitive = false
-    }
-
-    shadow("blue.endless:jankson:1.1.+")
-    implementation("blue.endless:jankson:1.1.+")
-
-    shadow("com.moandjiezana.toml:toml4j:0.7.+") {
-        exclude(group: "com.google.code.gson", module: "gson")
-    }
-    implementation("com.moandjiezana.toml:toml4j:0.7.+")
-}
-
-def dependModule(moduleName, fapiVersion, include = true) {
-    depend("net.fabricmc.fabric-api:$moduleName:${fabricApi.moduleVersion(moduleName, fapiVersion)}", include)
-}
-
-def depend(str, include = true) {
-    dependencies.modRuntime(str) {
-        exclude(module: "fabric-biomes-v1")
-    }
-    dependencies.modCompileOnly(str) {
-        exclude(module: "fabric-biomes-v1")
-    }
-    if (include)
-        dependencies.include(str)
-}
-
-processResources {
-    inputs.property "version", project.version
-
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+    loom {
+        silentMojangMappingsLicense()
+        useFabricMixin = true
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'architectury-plugin'
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set("sources")
-    from sourceSets.main.allSource
-}
+    ext {
+        isSnapshot = System.getenv("PR_NUM") != null
+    }
 
-shadowJar {
-    relocate("blue.endless.jankson", "${basePackage}.shadowed.blue.endless.jankson")
-    relocate("com.moandjiezana.toml", "${basePackage}.shadowed.com.moandjiezana.toml")
+    def runNumber = (System.getenv("GITHUB_RUN_NUMBER") == null ? "9999" : System.getenv("GITHUB_RUN_NUMBER"))
 
-    configurations = [project.configurations.shadow]
-    classifier "shadow"
-}
+    if (!ext.isSnapshot) {
+        version = rootProject.base_version + "." + runNumber
+        archivesBaseName = rootProject.archives_base_name
+    } else {
+        version = rootProject.base_version + "-PR." + System.getenv("PR_NUM") + "." + runNumber
+        archivesBaseName = rootProject.archives_base_name_snapshot
+    }
 
-jar {
-    from("LICENSE")
+    group = rootProject.maven_group
+
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+
+        // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
+        // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
+        // We'll use that if it's available, but otherwise we'll use the older option.
+        def targetVersion = 8
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.release = targetVersion
+        }
+    }
+
 }
 
 bintray {
-    user = System.getenv("BINTRAY_USER")
-    key = System.getenv("BINTRAY_KEY")
-    setPublications("mavenJava")
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_KEY')
+    publications = ["mavenCommon", "mavenFabric", "mavenForge"]
     publish = true
     pkg {
         repo = "autoconfig1u"
@@ -115,35 +64,13 @@ bintray {
         userOrg = "shedaniel"
         licenses = ["Apache-2.0"]
         version {
-            name = modVersion
-            vcsTag = modVersion
-            githubRepo = "shedaniel/AutoConfig"
-            websiteUrl = "https://github.com/shedaniel/AutoConfig"
-            issueTrackerUrl = "https://github.com/shedaniel/AutoConfig/issues"
-            vcsUrl = "https://github.com/shedaniel/AutoConfig.git"
-            gpg.sign = true
+            name = project.version
+            vcsTag = project.version
+            released = new Date()
+            githubRepo = "architectury/AutoConfig"
+            websiteUrl = "https://github.com/architectury/AutoConfig"
+            issueTrackerUrl = "https://github.com/architectury/AutoConfig/issues"
+            vcsUrl = "https://github.com/architectury/AutoConfig.git"
         }
     }
 }
-
-remapJar {
-    dependsOn(shadowJar)
-    input.set(shadowJar.archivePath)
-}
-
-def remapSourcesJar = tasks.getByName("remapSourcesJar")
-
-publishing {
-    publications {
-        mavenJava(MavenPublication.class) {
-            artifact(remapJar)
-            artifact(sourcesJar) {
-                builtBy(remapSourcesJar)
-            }
-        }
-    }
-
-    repositories {
-    }
-}
-
