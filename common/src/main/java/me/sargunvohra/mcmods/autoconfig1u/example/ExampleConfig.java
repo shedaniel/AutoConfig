@@ -10,7 +10,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 @ApiStatus.Internal
 @Config(name = "autoconfig1u_example")
 @Config.Gui.Background("minecraft:textures/block/oak_planks.png")
@@ -39,20 +39,20 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     private static class ModuleA implements ConfigData {
         
         @ConfigEntry.Gui.PrefixText
-        private final boolean aBoolean = true;
+        private boolean aBoolean = true;
         
         @ConfigEntry.Gui.Tooltip(count = 2)
-        private final ExampleEnum anEnum = ExampleEnum.FOO;
+        private ExampleEnum anEnum = ExampleEnum.FOO;
         
         @ConfigEntry.Gui.Tooltip(count = 2)
         @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
-        private final ExampleEnum anEnumWithButton = ExampleEnum.FOO;
+        private ExampleEnum anEnumWithButton = ExampleEnum.FOO;
         
         @Comment("This tooltip was automatically applied from a Jankson @Comment")
-        private final String aString = "hello";
+        private String aString = "hello";
         
         @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
-        private final PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
+        private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
         
         private final List<Integer> list = Arrays.asList(1, 2, 3);
         
@@ -63,19 +63,19 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     private static class ModuleB implements ConfigData {
         
         @ConfigEntry.BoundedDiscrete(min = -1000, max = 2000)
-        private final int intSlider = 500;
+        private int intSlider = 500;
         
         @ConfigEntry.BoundedDiscrete(min = -1000, max = 2000)
-        private final Long longSlider = 500L;
+        private Long longSlider = 500L;
         
         @ConfigEntry.Gui.TransitiveObject
-        private final PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
+        private PairOfIntPairs anObject = new PairOfIntPairs(new PairOfInts(), new PairOfInts(3, 4));
         
         @ConfigEntry.Gui.Excluded
-        private final List<PairOfInts> aList = Arrays.asList(new PairOfInts(), new PairOfInts(3, 4));
+        private List<PairOfInts> aList = Arrays.asList(new PairOfInts(), new PairOfInts(3, 4));
         
         @ConfigEntry.ColorPicker
-        private final int color = 0xFFFFFF;
+        private int color = 0xFFFFFF;
     }
     
     @Config(name = "empty")
@@ -85,8 +85,8 @@ public class ExampleConfig extends PartitioningSerializer.GlobalData {
     
     @SuppressWarnings("FieldCanBeLocal")
     private static class PairOfInts {
-        private final int foo;
-        private final int bar;
+        private int foo;
+        private int bar;
         
         PairOfInts() {
             this(1, 2);

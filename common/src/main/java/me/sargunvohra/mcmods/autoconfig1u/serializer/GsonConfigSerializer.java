@@ -17,12 +17,12 @@ import java.nio.file.Path;
 /**
  * This serializer serializes configs into Json files using Gson.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "FieldMayBeFinal"})
 public class GsonConfigSerializer<T extends ConfigData> implements ConfigSerializer<T> {
     
-    private final Config definition;
-    private final Class<T> configClass;
-    private final Gson gson;
+    private Config definition;
+    private Class<T> configClass;
+    private Gson gson;
     
     @SuppressWarnings("WeakerAccess")
     public GsonConfigSerializer(Config definition, Class<T> configClass, Gson gson) {
