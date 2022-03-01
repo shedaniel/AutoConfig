@@ -94,6 +94,10 @@ jar {
     from("LICENSE")
 }
 
+prepareRemapJar {
+    dependsOn(shadowJar)
+}
+
 remapJar {
     dependsOn(shadowJar)
     input.set(shadowJar.archivePath)
