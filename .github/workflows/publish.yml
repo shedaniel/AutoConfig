@@ -22,6 +22,6 @@ jobs:
       - name: Upload to CurseForge
         run: ./gradlew build publish curseforge --stacktrace
         env:
-          danielshe_curse_api_key: ${{ secrets.CF_API_KEY }}
+          curse_api_key: ${{ secrets.CF_API_KEY }}
           BRANCH_NAME: ${{ github.ref }}
           MAVEN_PASS: ${{ secrets.MAVEN_PASS }}
